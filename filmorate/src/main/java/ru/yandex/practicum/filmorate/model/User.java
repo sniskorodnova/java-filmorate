@@ -13,7 +13,11 @@ public class User {
     private LocalDate birthday;
     private static AtomicLong counter = new AtomicLong(0);
 
-    public static Long setCounter() {
+    public static void setCounter(AtomicLong counter) {
+        User.counter = counter;
+    }
+
+    public static Long setIdCounter() {
         return counter.incrementAndGet();
     }
 }
