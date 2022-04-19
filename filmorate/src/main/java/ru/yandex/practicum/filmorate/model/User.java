@@ -4,6 +4,9 @@ import lombok.Data;
 import java.time.LocalDate;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * Класс, описывающий сущность пользователь
+ */
 @Data
 public class User {
     private Long id;

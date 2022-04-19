@@ -7,9 +7,11 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.concurrent.atomic.AtomicLong;
-
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Класс с тестами для класса FilmController
+ */
 class FilmControllerTest {
     FilmController filmController;
 
@@ -28,7 +30,7 @@ class FilmControllerTest {
         Film film = new Film();
         film.setDescription("Description");
         film.setReleaseDate(LocalDate.of(2000, 2, 26));
-        film.setFilmDuration(Duration.ofMinutes(125));
+        film.setDuration(Duration.ofMinutes(125));
         ValidationException ex = assertThrows(ValidationException.class, () -> filmController.create(film));
         assertEquals("Имя фильма не может быть пустым", ex.getMessage());
     }
@@ -39,7 +41,7 @@ class FilmControllerTest {
         film.setName(" ");
         film.setDescription("Description");
         film.setReleaseDate(LocalDate.of(2000, 2, 26));
-        film.setFilmDuration(Duration.ofMinutes(125));
+        film.setDuration(Duration.ofMinutes(125));
         ValidationException ex = assertThrows(ValidationException.class, () -> filmController.create(film));
         assertEquals("Имя фильма не может быть пустым", ex.getMessage());
     }
@@ -50,7 +52,7 @@ class FilmControllerTest {
         film.setName("Name");
         film.setDescription("Description");
         film.setReleaseDate(LocalDate.of(2000, 2, 26));
-        film.setFilmDuration(Duration.ofMinutes(125));
+        film.setDuration(Duration.ofMinutes(125));
         filmController.create(film);
         assertEquals(1, filmController.getAll().size());
     }
@@ -63,7 +65,7 @@ class FilmControllerTest {
                 "VeeryLongDescriptionVeeryLongDescriptionVeeryLongDescriptionVeeryLongDescriptionVeeryLongDescription" +
                 "VeeryLongDescription1");
         film.setReleaseDate(LocalDate.of(2000, 2, 26));
-        film.setFilmDuration(Duration.ofMinutes(125));
+        film.setDuration(Duration.ofMinutes(125));
         ValidationException ex = assertThrows(ValidationException.class, () -> filmController.create(film));
         assertEquals("Описание фильма не может быть больше 200 символов", ex.getMessage());
     }
@@ -76,7 +78,7 @@ class FilmControllerTest {
                 "VeeryLongDescriptionVeeryLongDescriptionVeeryLongDescriptionVeeryLongDescriptionVeeryLongDescription" +
                 "VeeryLongDescription");
         film.setReleaseDate(LocalDate.of(2000, 2, 26));
-        film.setFilmDuration(Duration.ofMinutes(125));
+        film.setDuration(Duration.ofMinutes(125));
         filmController.create(film);
         assertEquals(1, filmController.getAll().size());
     }
@@ -87,7 +89,7 @@ class FilmControllerTest {
         film.setName("Name");
         film.setDescription("Description");
         film.setReleaseDate(LocalDate.of(1895, 12, 27));
-        film.setFilmDuration(Duration.ofMinutes(125));
+        film.setDuration(Duration.ofMinutes(125));
         ValidationException ex = assertThrows(ValidationException.class, () -> filmController.create(film));
         assertEquals("Дата выхода фильма не может быть раньше 28 декабря 1895 года", ex.getMessage());
     }
@@ -98,7 +100,7 @@ class FilmControllerTest {
         film.setName("Name");
         film.setDescription("Description");
         film.setReleaseDate(LocalDate.of(1895, 12, 29));
-        film.setFilmDuration(Duration.ofMinutes(125));
+        film.setDuration(Duration.ofMinutes(125));
         filmController.create(film);
         assertEquals(1, filmController.getAll().size());
     }
@@ -109,7 +111,7 @@ class FilmControllerTest {
         film.setName("Name");
         film.setDescription("Description");
         film.setReleaseDate(LocalDate.of(1995, 12, 27));
-        film.setFilmDuration(Duration.ofMinutes(0));
+        film.setDuration(Duration.ofMinutes(0));
         ValidationException ex = assertThrows(ValidationException.class, () -> filmController.create(film));
         assertEquals("Продолжительность фильма не может быть отрицательной или равной нулю", ex.getMessage());
     }
@@ -120,7 +122,7 @@ class FilmControllerTest {
         film.setName("Name");
         film.setDescription("Description");
         film.setReleaseDate(LocalDate.of(1995, 12, 27));
-        film.setFilmDuration(Duration.ofMinutes(-150));
+        film.setDuration(Duration.ofMinutes(-150));
         ValidationException ex = assertThrows(ValidationException.class, () -> filmController.create(film));
         assertEquals("Продолжительность фильма не может быть отрицательной или равной нулю", ex.getMessage());
     }
@@ -131,14 +133,14 @@ class FilmControllerTest {
         film1.setName("Name1");
         film1.setDescription("Description1");
         film1.setReleaseDate(LocalDate.of(1995, 12, 27));
-        film1.setFilmDuration(Duration.ofMinutes(150));
+        film1.setDuration(Duration.ofMinutes(150));
         filmController.create(film1);
         Film film2 = new Film();
         film2.setId(1L);
         film2.setName("");
         film2.setDescription("Description2");
         film2.setReleaseDate(LocalDate.of(1995, 12, 27));
-        film2.setFilmDuration(Duration.ofMinutes(150));
+        film2.setDuration(Duration.ofMinutes(150));
         ValidationException ex = assertThrows(ValidationException.class, () -> filmController.update(film2));
         assertEquals("Имя фильма не может быть пустым", ex.getMessage());
     }
@@ -149,7 +151,7 @@ class FilmControllerTest {
         film1.setName("Name1");
         film1.setDescription("Description1");
         film1.setReleaseDate(LocalDate.of(1995, 12, 27));
-        film1.setFilmDuration(Duration.ofMinutes(150));
+        film1.setDuration(Duration.ofMinutes(150));
         filmController.create(film1);
         Film film2 = new Film();
         film2.setId(1L);
@@ -158,7 +160,7 @@ class FilmControllerTest {
                 "VeeryLongDescriptionVeeryLongDescriptionVeeryLongDescriptionVeeryLongDescriptionVeeryLongDescription" +
                 "VeeryLongDescription1");
         film2.setReleaseDate(LocalDate.of(1995, 12, 27));
-        film2.setFilmDuration(Duration.ofMinutes(150));
+        film2.setDuration(Duration.ofMinutes(150));
         ValidationException ex = assertThrows(ValidationException.class, () -> filmController.update(film2));
         assertEquals("Описание фильма не может быть больше 200 символов", ex.getMessage());
     }
@@ -169,14 +171,14 @@ class FilmControllerTest {
         film1.setName("Name1");
         film1.setDescription("Description1");
         film1.setReleaseDate(LocalDate.of(1995, 12, 27));
-        film1.setFilmDuration(Duration.ofMinutes(150));
+        film1.setDuration(Duration.ofMinutes(150));
         filmController.create(film1);
         Film film2 = new Film();
         film2.setId(1L);
         film2.setName("Name2");
         film2.setDescription("Description2");
         film2.setReleaseDate(LocalDate.of(1895, 12, 27));
-        film2.setFilmDuration(Duration.ofMinutes(150));
+        film2.setDuration(Duration.ofMinutes(150));
         ValidationException ex = assertThrows(ValidationException.class, () -> filmController.update(film2));
         assertEquals("Дата выхода фильма не может быть раньше 28 декабря 1895 года", ex.getMessage());
     }
@@ -187,14 +189,14 @@ class FilmControllerTest {
         film1.setName("Name1");
         film1.setDescription("Description1");
         film1.setReleaseDate(LocalDate.of(1995, 12, 27));
-        film1.setFilmDuration(Duration.ofMinutes(150));
+        film1.setDuration(Duration.ofMinutes(150));
         filmController.create(film1);
         Film film2 = new Film();
         film2.setId(1L);
         film2.setName("Name2");
         film2.setDescription("Description2");
         film2.setReleaseDate(LocalDate.of(2005, 12, 27));
-        film2.setFilmDuration(Duration.ofMinutes(0));
+        film2.setDuration(Duration.ofMinutes(0));
         ValidationException ex = assertThrows(ValidationException.class, () -> filmController.update(film2));
         assertEquals("Продолжительность фильма не может быть отрицательной или равной нулю", ex.getMessage());
     }
@@ -205,14 +207,14 @@ class FilmControllerTest {
         film1.setName("Name1");
         film1.setDescription("Description1");
         film1.setReleaseDate(LocalDate.of(1995, 12, 27));
-        film1.setFilmDuration(Duration.ofMinutes(150));
+        film1.setDuration(Duration.ofMinutes(150));
         filmController.create(film1);
         Film film2 = new Film();
         film2.setId(1L);
         film2.setName("Name2");
         film2.setDescription("Description2");
         film2.setReleaseDate(LocalDate.of(2005, 12, 27));
-        film2.setFilmDuration(Duration.ofMinutes(180));
+        film2.setDuration(Duration.ofMinutes(180));
         filmController.update(film2);
         assertEquals(1, filmController.getAll().size());
         assertEquals(film2, filmController.getAll().get(0));
@@ -224,13 +226,13 @@ class FilmControllerTest {
         film1.setName("Name1");
         film1.setDescription("Description1");
         film1.setReleaseDate(LocalDate.of(1995, 12, 27));
-        film1.setFilmDuration(Duration.ofMinutes(150));
+        film1.setDuration(Duration.ofMinutes(150));
         filmController.create(film1);
         Film film2 = new Film();
         film2.setName("Name2");
         film2.setDescription("Description2");
         film2.setReleaseDate(LocalDate.of(2005, 12, 27));
-        film2.setFilmDuration(Duration.ofMinutes(180));
+        film2.setDuration(Duration.ofMinutes(180));
         filmController.create(film2);
         assertEquals(2, filmController.getAll().size());
         assertEquals(film1, filmController.getAll().get(0));

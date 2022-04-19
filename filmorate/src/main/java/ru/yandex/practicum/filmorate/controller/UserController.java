@@ -8,12 +8,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Класс-контроллер пользователя. Все пользователи хранятся в хэш-мапе с ключом Id
+ */
 @RestController
 @Slf4j
 @RequestMapping("/users")
 public class UserController {
     private HashMap<Long, User> users = new HashMap<>();
 
+    /**
+     * Метод для получения списка всех пользователей
+     */
     @GetMapping
     public List<User> getAll() {
         log.info("Входящий запрос на получение списка всех пользователей");
@@ -26,9 +32,13 @@ public class UserController {
         return userList;
     }
 
+    /**
+     * Метод для создания пользователя. Пользователь создается только если будут пройдены все валидации данных
+     */
     @PostMapping
     public User create(@RequestBody User user) {
         log.info("Входящий запрос на создание пользователя");
+        log.info(user.toString());
         if (user.getEmail() == null || user.getEmail().isEmpty() || !user.getEmail().contains("@")) {
             log.info("Произошла ошибка валидации при создании пользователя:");
             throw new ValidationException("Почта пользователя не может быть пустой и должна содержать символ @");
@@ -49,9 +59,15 @@ public class UserController {
         }
     }
 
+    /**
+     * Метод для редактирования пользователя. Чтобы отредактировать пользователя, в теле запроса надо передать
+     * id пользователя, которого нужно отредактировать. Пользоаватель будет отредактирован, только если будут
+     * пройдены все валидации данных
+     */
     @PutMapping
     public User update(@RequestBody User user) {
         log.info("Входящий запрос на редактирование пользователя");
+        log.info(user.toString());
         if (user.getEmail() == null || !user.getEmail().contains("@")) {
             log.info("Произошла ошибка валидации при редактировании пользователя:");
             throw new ValidationException("Почта пользователя не может быть пустой и должна содержать символ @");

@@ -8,12 +8,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Класс-контроллер фильма. Все фильмы хранятся в хэш-мапе с ключом Id
+ */
 @RestController
 @Slf4j
 @RequestMapping("/films")
 public class FilmController {
     private HashMap<Long, Film> films = new HashMap<>();
 
+    /**
+     * Метод для получения списка всех фильмов
+     */
     @GetMapping
     public List<Film> getAll() {
         log.info("Входящий запрос на получение списка всех фильмов");
@@ -26,9 +32,13 @@ public class FilmController {
         return filmList;
     }
 
+    /**
+     * Метод для создания фильма. Фильм создается только если будут пройдены все валидации данных
+     */
     @PostMapping
     public Film create(@RequestBody Film film) {
         log.info("Входящий запрос на создание фильма");
+        log.info(film.toString());
         if (film.getName() == null || film.getName().isBlank()) {
             log.info("Произошла ошибка валидации при создании фильма:");
             throw new ValidationException("Имя фильма не может быть пустым");
@@ -38,7 +48,7 @@ public class FilmController {
         } else if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             log.info("Произошла ошибка валидации при создании фильма:");
             throw new ValidationException("Дата выхода фильма не может быть раньше 28 декабря 1895 года");
-        } else if (film.getFilmDuration().isNegative() || film.getFilmDuration().isZero()) {
+        } else if (film.getDuration().isNegative() || film.getDuration().isZero()) {
             log.info("Произошла ошибка валидации при создании фильма:");
             throw new ValidationException("Продолжительность фильма не может быть отрицательной или равной нулю");
         } else {
@@ -49,9 +59,14 @@ public class FilmController {
         }
     }
 
+    /**
+     * Метод для редактирования фильма. Чтобы отредактировать фильм, в теле запроса надо передать id фильма,
+     * которого нужно отредактировать. Фильм будет отредактирован, только если будут пройдены все валидации данных
+     */
     @PutMapping
     public Film update(@RequestBody Film film) {
         log.info("Входящий запрос на редактирование фильма");
+        log.info(film.toString());
         if (film.getName() == null || film.getName().isBlank()) {
             log.info("Произошла ошибка валидации при редактировании фильма:");
             throw new ValidationException("Имя фильма не может быть пустым");
@@ -61,7 +76,7 @@ public class FilmController {
         } else if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             log.info("Произошла ошибка валидации при редактировании фильма:");
             throw new ValidationException("Дата выхода фильма не может быть раньше 28 декабря 1895 года");
-        } else if (film.getFilmDuration().isNegative() || film.getFilmDuration().isZero()) {
+        } else if (film.getDuration().isNegative() || film.getDuration().isZero()) {
             log.info("Произошла ошибка валидации при редактировании фильма:");
             throw new ValidationException("Продолжительность фильма не может быть отрицательной или равной нулю");
         } else {
