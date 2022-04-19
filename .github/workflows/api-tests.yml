@@ -32,7 +32,7 @@ jobs:
           chmod a+x /tmp/wait-for-it.sh
 
       - name: Run Application
-        run: timeout 30 mvn spring-boot:run
+        run: nohup mvn spring-boot:run &
       - run: /tmp/wait-for-it.sh -t 120 localhost:8080 -- echo "application is up"
 
       - name: Test API POSTMAN
