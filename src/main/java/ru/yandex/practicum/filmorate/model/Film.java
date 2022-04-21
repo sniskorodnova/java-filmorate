@@ -15,8 +15,7 @@ public class Film {
     private String name;
     private String description;
     private LocalDate releaseDate;
-    @JsonFormat(shape = JsonFormat.Shape.NUMBER)
-    private Duration duration;
+    private Long duration;
     private static AtomicLong counter = new AtomicLong(0);
 
     public static void setCounter(AtomicLong counter) {
