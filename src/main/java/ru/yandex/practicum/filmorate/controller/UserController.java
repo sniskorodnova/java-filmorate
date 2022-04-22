@@ -34,7 +34,7 @@ public class UserController {
     public User create(@RequestBody User user) {
         log.info("Входящий запрос на создание пользователя");
         log.info(user.toString());
-        validateForCreate(user);
+        validate(user);
         Long generatedId = User.setIdCounter();
         user.setId(generatedId);
         if (user.getName() == null || user.getName().isBlank()) {
@@ -53,7 +53,7 @@ public class UserController {
     public User update(@RequestBody User user) {
         log.info("Входящий запрос на редактирование пользователя");
         log.info(user.toString());
-        validateForUpdate(user);
+        validate(user);
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
@@ -62,35 +62,18 @@ public class UserController {
     }
 
     /**
-     * Метод для валидации данных при создании пользователя. Если какая-либо валидация не пройдена, то
-     * выбрасывается исключение ValidationException
+     * Метод для валидации данных при создании и редактрования пользователя. Если какая-либо валидация не пройдена,
+     * то выбрасывается исключение ValidationException
      */
-    private void validateForCreate(User user) {
+    private void validate(User user) {
         if (user.getEmail() == null || user.getEmail().isEmpty() || !user.getEmail().contains("@")) {
-            log.info("Произошла ошибка валидации при создании пользователя:");
+            log.info("Произошла ошибка валидации для пользователя:");
             throw new ValidationException("Почта пользователя не может быть пустой и должна содержать символ @");
         } else if (user.getLogin() == null || user.getLogin().isEmpty() || user.getLogin().contains(" ")) {
-            log.info("Произошла ошибка валидации при создании пользователя:");
+            log.info("Произошла ошибка валидации для пользователя:");
             throw new ValidationException("Логин пользователя не может быть пустым и не должен содержать пробелов");
         } else if (user.getBirthday().isAfter(LocalDate.now())) {
-            log.info("Произошла ошибка валидации при создании пользователя:");
-            throw new ValidationException("День рождения пользователя не может быть в будущем");
-        }
-    }
-
-    /**
-     * Метод для валидации данных при редактировании пользователя. Если какая-либо валидация не пройдена, то
-     * выбрасывается исключение ValidationException
-     */
-    private void validateForUpdate(User user) {
-        if (user.getEmail() == null || !user.getEmail().contains("@")) {
-            log.info("Произошла ошибка валидации при редактировании пользователя:");
-            throw new ValidationException("Почта пользователя не может быть пустой и должна содержать символ @");
-        } else if (user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
-            log.info("Произошла ошибка валидации при редактировании пользователя:");
-            throw new ValidationException("Логин пользователя не может быть пустым и не должен содержать пробелов");
-        } else if (user.getBirthday().isAfter(LocalDate.now())) {
-            log.info("Произошла ошибка валидации при редактировании пользователя:");
+            log.info("Произошла ошибка валидации для пользователя:");
             throw new ValidationException("День рождения пользователя не может быть в будущем");
         }
     }

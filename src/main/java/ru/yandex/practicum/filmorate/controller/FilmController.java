@@ -35,7 +35,7 @@ public class FilmController {
     public Film create(@RequestBody Film film) {
         log.info("Входящий запрос на создание фильма");
         log.info(film.toString());
-        validateForCreate(film);
+        validate(film);
         Long generatedId = Film.setIdCounter();
         film.setId(generatedId);
         films.put(generatedId, film);
@@ -50,47 +50,27 @@ public class FilmController {
     public Film update(@RequestBody Film film) {
         log.info("Входящий запрос на редактирование фильма");
         log.info(film.toString());
-        validateForUpdate(film);
+        validate(film);
         films.put(film.getId(), film);
         return film;
     }
 
     /**
-     * Метод для валидации данных при создании фильма. Если какая-либо валидация не пройдена, то выбрасывается
-     * исключение ValidationException
+     * Метод для валидации данных при создании и редактировании фильма. Если какая-либо валидация не пройдена,
+     * то выбрасывается исключение ValidationException
      */
-    private void validateForCreate(Film film) {
+    private void validate(Film film) {
         if (film.getName() == null || film.getName().isBlank()) {
-            log.info("Произошла ошибка валидации при создании фильма:");
+            log.info("Произошла ошибка валидации для фильма:");
             throw new ValidationException("Имя фильма не может быть пустым");
         } else if (film.getDescription().length() > 200) {
-            log.info("Произошла ошибка валидации при создании фильма:");
+            log.info("Произошла ошибка валидации для фильма:");
             throw new ValidationException("Описание фильма не может быть больше 200 символов");
         } else if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            log.info("Произошла ошибка валидации при создании фильма:");
+            log.info("Произошла ошибка валидации для фильма:");
             throw new ValidationException("Дата выхода фильма не может быть раньше 28 декабря 1895 года");
         } else if (film.getDuration() <= 0) {
-            log.info("Произошла ошибка валидации при создании фильма:");
-            throw new ValidationException("Продолжительность фильма не может быть отрицательной или равной нулю");
-        }
-    }
-
-    /**
-     * Метод для валидации данных при редактировании фильма. Если какая-либо валидация не пройдена, то выбрасывается
-     * исключение ValidationException
-     */
-    private void validateForUpdate(Film film) {
-        if (film.getName() == null || film.getName().isBlank()) {
-            log.info("Произошла ошибка валидации при редактировании фильма:");
-            throw new ValidationException("Имя фильма не может быть пустым");
-        } else if (film.getDescription().length() > 200) {
-            log.info("Произошла ошибка валидации при редактировании фильма:");
-            throw new ValidationException("Описание фильма не может быть больше 200 символов");
-        } else if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            log.info("Произошла ошибка валидации при редактировании фильма:");
-            throw new ValidationException("Дата выхода фильма не может быть раньше 28 декабря 1895 года");
-        } else if (film.getDuration() <= 0) {
-            log.info("Произошла ошибка валидации при редактировании фильма:");
+            log.info("Произошла ошибка валидации для фильма:");
             throw new ValidationException("Продолжительность фильма не может быть отрицательной или равной нулю");
         }
     }
