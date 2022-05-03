@@ -125,9 +125,10 @@ public class FilmService {
         if (film.getName() == null || film.getName().isBlank()) {
             log.info("Произошла ошибка валидации для фильма:");
             throw new ValidationException("Имя фильма не может быть пустым");
-        } else if (film.getDescription().length() > 200) {
+        } else if (film.getDescription().length() > 200 || film.getDescription().isBlank()) {
             log.info("Произошла ошибка валидации для фильма:");
-            throw new ValidationException("Описание фильма не может быть больше 200 символов");
+            throw new ValidationException("Описание фильма должно содержать символы и не может быть"
+                    + "больше 200 символов");
         } else if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             log.info("Произошла ошибка валидации для фильма:");
             throw new ValidationException("Дата выхода фильма не может быть раньше 28 декабря 1895 года");
