@@ -78,7 +78,8 @@ class FilmControllerTest {
         film.setReleaseDate(LocalDate.of(2000, 2, 26));
         film.setDuration(125L);
         ValidationException ex = assertThrows(ValidationException.class, () -> filmController.create(film));
-        assertEquals("Описание фильма не может быть больше 200 символов", ex.getMessage());
+        assertEquals("Описание фильма должно содержать символы и не может быть больше 200 символов",
+                ex.getMessage());
     }
 
     @Test
@@ -173,7 +174,8 @@ class FilmControllerTest {
         film2.setReleaseDate(LocalDate.of(1995, 12, 27));
         film2.setDuration(150L);
         ValidationException ex = assertThrows(ValidationException.class, () -> filmController.update(film2));
-        assertEquals("Описание фильма не может быть больше 200 символов", ex.getMessage());
+        assertEquals("Описание фильма должно содержать символы и не может быть больше 200 символов",
+                ex.getMessage());
     }
 
     @Test
