@@ -1,9 +1,8 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import java.time.Duration;
 import java.time.LocalDate;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -16,6 +15,7 @@ public class Film {
     private String description;
     private LocalDate releaseDate;
     private Long duration;
+    private Set<Long> likesFromUsers;
     private static AtomicLong counter = new AtomicLong(0);
 
     public static void setCounter(AtomicLong counter) {
