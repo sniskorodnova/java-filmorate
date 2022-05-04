@@ -1,80 +1,124 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
- * Класс-контроллер пользователя. Все пользователи хранятся в хэш-мапе с ключом Id
+ * Класс-контроллер для работы с пользователями
  */
 @RestController
 @Slf4j
+@RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-    private HashMap<Long, User> users = new HashMap<>();
+    private final UserService userService;
+
+    public UserService getUserService() {
+        return userService;
+    }
+
+    /**
+     * Метод для получения пользователя по его id
+     */
+    @GetMapping("/{userId}")
+    public User getById(@PathVariable Long userId) throws UserNotFoundException {
+        log.debug("Входящий запрос на получение информации по пользователю с id = {}", userId);
+        return userService.getById(userId);
+    }
+
+    /**
+     * Метод для добавления пользователя в друзья другому пользователю
+     */
+    @PutMapping("/{userId}/friends/{friendId}")
+    public User addToFriends(@PathVariable Long userId, @PathVariable Long friendId) throws UserNotFoundException {
+        log.debug("Входящий запрос на добавление в друзья пользователя с id = {} пользователю c id = {}",
+                friendId, userId);
+        return userService.addToFriends(userId, friendId);
+    }
+
+    /**
+     * Метод для удаления пользователя из друзей другого пользователя
+     */
+    @DeleteMapping("/{userId}/friends/{friendId}")
+    public User deleteFromFriends(@PathVariable Long userId, @PathVariable Long friendId) throws UserNotFoundException {
+        log.debug("Входящий запрос на удаление из друзей пользователя с id = {} у пользователя c id = {}",
+                friendId, userId);
+        return userService.deleteFromFriends(userId, friendId);
+    }
+
+    /**
+     * Метод для получения списка друзей пользователя
+     */
+    @GetMapping("/{userId}/friends")
+    public List<User> getFriendsForUser(@PathVariable Long userId) throws UserNotFoundException {
+        log.debug("Входящий запрос на получения списка друзей для пользователя с id = {}", userId);
+        return userService.getFriendsForUser(userId);
+    }
+
+    /**
+     * Метод для получения списка общих друзей для двух пользователей
+     */
+    @GetMapping("/{userId}/friends/common/{otherUserId}")
+    public List<User> getCommonFriends(@PathVariable Long userId, @PathVariable Long otherUserId)
+            throws UserNotFoundException {
+        log.debug("Входящий запрос на получения списка общих друзей для пользователей с id = {} и пользователя "
+                + "с id = {}", userId, otherUserId);
+        return userService.getCommonFriends(userId, otherUserId);
+    }
 
     /**
      * Метод для получения списка всех пользователей
      */
     @GetMapping
     public List<User> getAll() {
-        log.info("Входящий запрос на получение списка всех пользователей");
-        return new ArrayList<>(users.values());
+        log.debug("Входящий запрос на получение списка всех пользователей");
+        return userService.getAll();
     }
 
     /**
-     * Метод для создания пользователя. Пользователь создается только если будут пройдены все валидации данных
+     * Метод для создания нового пользователя
      */
     @PostMapping
-    public User create(@RequestBody User user) {
-        log.info("Входящий запрос на создание пользователя");
-        log.info(user.toString());
-        validate(user);
-        Long generatedId = User.setIdCounter();
-        user.setId(generatedId);
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-        users.put(generatedId, user);
-        return user;
+    public User create(@RequestBody User user) throws ValidationException {
+        log.debug("Входящий запрос на создание пользователя");
+        log.debug(user.toString());
+        return userService.create(user);
     }
 
     /**
      * Метод для редактирования пользователя. Чтобы отредактировать пользователя, в теле запроса надо передать
-     * id пользователя, который нужно отредактировать. Пользоаватель будет отредактирован, только если будут
-     * пройдены все валидации данных
+     * id пользователя, который нужно отредактировать
      */
     @PutMapping
-    public User update(@RequestBody User user) {
-        log.info("Входящий запрос на редактирование пользователя");
-        log.info(user.toString());
-        validate(user);
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-        users.put(user.getId(), user);
-        return user;
+    public User update(@RequestBody User user) throws ValidationException {
+        log.debug("Входящий запрос на редактирование пользователя");
+        log.debug(user.toString());
+        return userService.update(user);
     }
 
     /**
-     * Метод для валидации данных при создании и редактрования пользователя. Если какая-либо валидация не пройдена,
-     * то выбрасывается исключение ValidationException
+     * Обработка ошибки, если пользователь не найден
      */
-    private void validate(User user) {
-        if (user.getEmail() == null || user.getEmail().isEmpty() || !user.getEmail().contains("@")) {
-            log.info("Произошла ошибка валидации для пользователя:");
-            throw new ValidationException("Почта пользователя не может быть пустой и должна содержать символ @");
-        } else if (user.getLogin() == null || user.getLogin().isEmpty() || user.getLogin().contains(" ")) {
-            log.info("Произошла ошибка валидации для пользователя:");
-            throw new ValidationException("Логин пользователя не может быть пустым и не должен содержать пробелов");
-        } else if (user.getBirthday().isAfter(LocalDate.now())) {
-            log.info("Произошла ошибка валидации для пользователя:");
-            throw new ValidationException("День рождения пользователя не может быть в будущем");
-        }
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleUserNotFound(final UserNotFoundException e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
+    /**
+     * Обработка ошибки сервера
+     */
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleServerError(final RuntimeException e) {
+        return new ErrorResponse(e.getMessage());
     }
 }
