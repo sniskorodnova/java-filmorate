@@ -49,7 +49,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void createUserValidEmailSuccess() {
+    public void createUserValidEmailSuccess() throws ValidationException {
         User user = new User();
         user.setEmail("qwerty@gmail.com");
         user.setName("UserName");
@@ -84,7 +84,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void createUserValidLoginSuccess() {
+    public void createUserValidLoginSuccess() throws ValidationException {
         User user = new User();
         user.setEmail("qwerty@gmail.com");
         user.setName("UserName");
@@ -106,7 +106,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void createUserValidBirthdaySuccess() {
+    public void createUserValidBirthdaySuccess() throws ValidationException {
         User user = new User();
         user.setEmail("qwerty@gmail.com");
         user.setName("UserName");
@@ -117,7 +117,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void createUserNameIsEmptyNameEqualsLogin() {
+    public void createUserNameIsEmptyNameEqualsLogin() throws ValidationException {
         User user = new User();
         user.setEmail("qwerty@gmail.com");
         user.setBirthday(LocalDate.of(1990, 6, 9));
@@ -127,7 +127,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void createUserNameHasOnlySpacesNameEqualsLogin() {
+    public void createUserNameHasOnlySpacesNameEqualsLogin() throws ValidationException {
         User user = new User();
         user.setEmail("qwerty@gmail.com");
         user.setBirthday(LocalDate.of(1990, 6, 9));
@@ -138,7 +138,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void updateUserNewEmptyEmailThrowsValidationException() {
+    public void updateUserNewEmptyEmailThrowsValidationException() throws ValidationException {
         User user1 = new User();
         user1.setEmail("qwerty@gmail.com");
         user1.setName("UserName");
@@ -155,7 +155,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void updateUserNewInvalidEmailThrowsValidationException() {
+    public void updateUserNewInvalidEmailThrowsValidationException() throws ValidationException {
         User user1 = new User();
         user1.setEmail("qwerty@gmail.com");
         user1.setName("UserName");
@@ -172,7 +172,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void updateUserNewEmptyLoginThrowsValidationException() {
+    public void updateUserNewEmptyLoginThrowsValidationException() throws ValidationException {
         User user1 = new User();
         user1.setEmail("qwerty@gmail.com");
         user1.setName("UserName");
@@ -190,7 +190,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void updateUserNewLoginHasSpacesThrowsValidationException() {
+    public void updateUserNewLoginHasSpacesThrowsValidationException() throws ValidationException {
         User user1 = new User();
         user1.setEmail("qwerty@gmail.com");
         user1.setName("UserName");
@@ -208,7 +208,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void updateUserNewBirthdayIsAfterNowThrowsValidationException() {
+    public void updateUserNewBirthdayIsAfterNowThrowsValidationException() throws ValidationException {
         User user1 = new User();
         user1.setEmail("qwerty@gmail.com");
         user1.setName("UserName");
@@ -225,7 +225,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void updateUserNewNameIsEmptyNameEqualsLogin() {
+    public void updateUserNewNameIsEmptyNameEqualsLogin() throws ValidationException {
         User user1 = new User();
         user1.setEmail("qwerty@gmail.com");
         user1.setName("UserName");
@@ -242,7 +242,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void updateUserSuccess() {
+    public void updateUserSuccess() throws ValidationException {
         User user1 = new User();
         user1.setEmail("qwerty@gmail.com");
         user1.setName("UserName");
@@ -261,7 +261,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void createAndGetTwoUsers() {
+    public void createAndGetTwoUsers() throws ValidationException {
         User user1 = new User();
         user1.setEmail("qwerty@gmail.com");
         user1.setName("UserName");
@@ -280,7 +280,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void createAndGetUserById() {
+    public void createAndGetUserById() throws ValidationException, UserNotFoundException {
         User user = new User();
         user.setEmail("qwerty@gmail.com");
         user.setName("UserName");
@@ -298,7 +298,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void addFriendToNonExistedUserThrowNotFoundUserException() {
+    public void addFriendToNonExistedUserThrowNotFoundUserException() throws ValidationException {
         User user1 = new User();
         user1.setEmail("qwerty@gmail.com");
         user1.setName("UserName");
@@ -311,7 +311,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void addNonExistedFriendToUserThrowNotFoundUserException() {
+    public void addNonExistedFriendToUserThrowNotFoundUserException() throws ValidationException {
         User user1 = new User();
         user1.setEmail("qwerty@gmail.com");
         user1.setName("UserName");
@@ -324,7 +324,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void addFriendToUserSuccess() {
+    public void addFriendToUserSuccess() throws ValidationException, UserNotFoundException {
         User user1 = new User();
         user1.setEmail("qwerty@gmail.com");
         user1.setName("UserName");
@@ -342,7 +342,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void deleteFriendFromNonExistedUserThrowNotFoundUserException() {
+    public void deleteFriendFromNonExistedUserThrowNotFoundUserException() throws ValidationException {
         User user1 = new User();
         user1.setEmail("qwerty@gmail.com");
         user1.setName("UserName");
@@ -355,7 +355,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void deleteNonExistedFriendFromUserThrowNotFoundUserException() {
+    public void deleteNonExistedFriendFromUserThrowNotFoundUserException() throws ValidationException {
         User user1 = new User();
         user1.setEmail("qwerty@gmail.com");
         user1.setName("UserName");
@@ -368,7 +368,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void deleteFriendFromUserSuccess() {
+    public void deleteFriendFromUserSuccess() throws ValidationException, UserNotFoundException {
         User user1 = new User();
         user1.setEmail("qwerty@gmail.com");
         user1.setName("UserName");
@@ -387,7 +387,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void getFriendsForUserNoFriends() {
+    public void getFriendsForUserNoFriends() throws ValidationException, UserNotFoundException {
         User user1 = new User();
         user1.setEmail("qwerty@gmail.com");
         user1.setName("UserName");
@@ -398,7 +398,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void getFriendsForUserOneFriend() {
+    public void getFriendsForUserOneFriend() throws ValidationException, UserNotFoundException {
         User user1 = new User();
         user1.setEmail("qwerty@gmail.com");
         user1.setName("UserName");
@@ -424,7 +424,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void getCommonFriendsNoFriends() {
+    public void getCommonFriendsNoFriends() throws ValidationException, UserNotFoundException {
         User user1 = new User();
         user1.setEmail("qwerty@gmail.com");
         user1.setName("UserName");
@@ -441,7 +441,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void getCommonFriendsFroNonExistedUserThrowUserNotFoundException() {
+    public void getCommonFriendsFroNonExistedUserThrowUserNotFoundException() throws ValidationException {
         User user1 = new User();
         user1.setEmail("qwerty@gmail.com");
         user1.setName("UserName");
@@ -454,7 +454,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void getCommonFriendsFroNonExistedOtherUser() {
+    public void getCommonFriendsFroNonExistedOtherUser() throws ValidationException {
         User user1 = new User();
         user1.setEmail("qwerty@gmail.com");
         user1.setName("UserName");
@@ -467,7 +467,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void getCommonFriendsOneFriend() {
+    public void getCommonFriendsOneFriend() throws ValidationException, UserNotFoundException {
         User user1 = new User();
         user1.setEmail("qwerty@gmail.com");
         user1.setName("UserName");

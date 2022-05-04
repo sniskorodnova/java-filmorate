@@ -43,7 +43,7 @@ public class FilmService {
     /**
      * Метод создания нового фильма. Перед добавлением фильм валидируется
      */
-    public Film create(Film film) {
+    public Film create(Film film) throws ValidationException {
         validate(film);
         return filmStorage.create(film);
     }
@@ -51,7 +51,7 @@ public class FilmService {
     /**
      * Метод редактирования существующего фильма. Перед редактированием новый объект фильма валидируется
      */
-    public Film update(Film film) {
+    public Film update(Film film) throws ValidationException {
         validate(film);
         return filmStorage.update(film);
     }
@@ -59,7 +59,7 @@ public class FilmService {
     /**
      * Метод получения фильма по его id
      */
-    public Film getById(Long filmId) {
+    public Film getById(Long filmId) throws FilmNotFoundException {
         final Film film = filmStorage.getById(filmId);
         if (film == null) {
             throw new FilmNotFoundException("Film with id = " + filmId + " not found");
@@ -79,7 +79,7 @@ public class FilmService {
     /**
      * Метод добавления лайка фильму от пользователя
      */
-    public Film likeFilm(Long filmId, Long userId) {
+    public Film likeFilm(Long filmId, Long userId) throws UserNotFoundException, FilmNotFoundException {
         Film film = filmStorage.getById(filmId);
 
         if (film == null) {
@@ -100,7 +100,7 @@ public class FilmService {
     /**
      * Метод удаления лайка пользователя у фильма
      */
-    public Film deleteLike(Long filmId, Long userId) {
+    public Film deleteLike(Long filmId, Long userId) throws UserNotFoundException, FilmNotFoundException {
         Film film = filmStorage.getById(filmId);
         if (film == null) {
             throw new FilmNotFoundException("Film with id = " + filmId + " not found");
@@ -121,19 +121,19 @@ public class FilmService {
      * Метод для валидации данных при создании и редактировании фильма. Если какая-либо валидация не пройдена,
      * то выбрасывается исключение ValidationException
      */
-    private void validate(Film film) {
+    private void validate(Film film) throws ValidationException {
         if (film.getName() == null || film.getName().isBlank()) {
-            log.info("Произошла ошибка валидации для фильма:");
+            log.debug("Произошла ошибка валидации для фильма:");
             throw new ValidationException("Имя фильма не может быть пустым");
         } else if (film.getDescription().length() > 200 || film.getDescription().isBlank()) {
-            log.info("Произошла ошибка валидации для фильма:");
+            log.debug("Произошла ошибка валидации для фильма:");
             throw new ValidationException("Описание фильма должно содержать символы и не может быть "
                     + "больше 200 символов");
         } else if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            log.info("Произошла ошибка валидации для фильма:");
+            log.debug("Произошла ошибка валидации для фильма:");
             throw new ValidationException("Дата выхода фильма не может быть раньше 28 декабря 1895 года");
         } else if (film.getDuration() <= 0) {
-            log.info("Произошла ошибка валидации для фильма:");
+            log.debug("Произошла ошибка валидации для фильма:");
             throw new ValidationException("Продолжительность фильма не может быть отрицательной или равной нулю");
         }
     }

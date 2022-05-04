@@ -1,11 +1,12 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -16,6 +17,7 @@ import java.util.List;
  */
 @RestController
 @Slf4j
+@RequiredArgsConstructor
 @RequestMapping("/films")
 public class FilmController {
     private final FilmService filmService;
@@ -24,17 +26,12 @@ public class FilmController {
         return filmService;
     }
 
-    @Autowired
-    public FilmController(FilmService filmService){
-        this.filmService = filmService;
-    }
-
     /**
      * Метод для получения списка всех фильмов
      */
     @GetMapping
     public List<Film> getAll() {
-        log.info("Входящий запрос на получение списка всех фильмов");
+        log.debug("Входящий запрос на получение списка всех фильмов");
         return filmService.getAll();
     }
 
@@ -42,9 +39,9 @@ public class FilmController {
      * Метод для создания фильма
      */
     @PostMapping
-    public Film create(@RequestBody Film film) {
-        log.info("Входящий запрос на создание фильма");
-        log.info(film.toString());
+    public Film create(@RequestBody Film film) throws ValidationException {
+        log.debug("Входящий запрос на создание фильма");
+        log.debug(film.toString());
         return filmService.create(film);
     }
 
@@ -53,9 +50,9 @@ public class FilmController {
      * который нужно отредактировать
      */
     @PutMapping
-    public Film update(@RequestBody Film film) {
-        log.info("Входящий запрос на редактирование фильма");
-        log.info(film.toString());
+    public Film update(@RequestBody Film film) throws ValidationException {
+        log.debug("Входящий запрос на редактирование фильма");
+        log.debug(film.toString());
         return filmService.update(film);
     }
 
@@ -63,8 +60,8 @@ public class FilmController {
      * Метод для получения фильма по его id
      */
     @GetMapping("/{filmId}")
-    public Film getById(@PathVariable Long filmId) {
-        log.info("Входящий запрос на получение фильма по id = " + filmId);
+    public Film getById(@PathVariable Long filmId) throws FilmNotFoundException {
+        log.debug("Входящий запрос на получение фильма по id = {}", filmId);
         return filmService.getById(filmId);
     }
 
@@ -72,9 +69,9 @@ public class FilmController {
      * Метод для проставления лайка фильму пользователем
      */
     @PutMapping("/{filmId}/like/{userId}")
-    public Film likeFilm(@PathVariable Long filmId, @PathVariable Long userId) {
-        log.info("Входящий запрос на проставление лайка пользователем с id = " + userId + " для фильма"
-                + " с id = " + filmId);
+    public Film likeFilm(@PathVariable Long filmId, @PathVariable Long userId)
+            throws UserNotFoundException, FilmNotFoundException {
+        log.debug("Входящий запрос на проставление лайка пользователем с id = {} для фильма с id = {}", userId, filmId);
         return filmService.likeFilm(filmId, userId);
     }
 
@@ -82,9 +79,9 @@ public class FilmController {
      * Метод для удаления лайка фильму пользователем
      */
     @DeleteMapping("/{filmId}/like/{userId}")
-    public Film deleteLike(@PathVariable Long filmId, @PathVariable Long userId) {
-        log.info("Входящий запрос на удаление лайка пользователем с id = " + userId + " для фильма"
-                + " с id = " + filmId);
+    public Film deleteLike(@PathVariable Long filmId, @PathVariable Long userId)
+            throws UserNotFoundException, FilmNotFoundException {
+        log.debug("Входящий запрос на удаление лайка пользователем с id = {} для фильма с id = {}", userId, filmId);
         return filmService.deleteLike(filmId, userId);
     }
 
@@ -93,7 +90,7 @@ public class FilmController {
      */
     @GetMapping("/popular")
     public List<Film> getCountFilms(@RequestParam(defaultValue = "10") int count) {
-        log.info("Входящий запрос на получение первых " + count + " популярных фильмов");
+        log.debug("Входящий запрос на получение первых {} популярных фильмов", count);
         return filmService.getCountFilms(count);
     }
 

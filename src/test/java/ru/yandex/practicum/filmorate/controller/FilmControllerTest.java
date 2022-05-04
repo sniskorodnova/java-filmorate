@@ -58,7 +58,7 @@ class FilmControllerTest {
     }
 
     @Test
-    public void createValidFilmNameSuccess() {
+    public void createValidFilmNameSuccess() throws ValidationException {
         Film film = new Film();
         film.setName("Name");
         film.setDescription("Description");
@@ -83,7 +83,7 @@ class FilmControllerTest {
     }
 
     @Test
-    public void createFilmDescriptionHas200SymbolsSuccess() {
+    public void createFilmDescriptionHas200SymbolsSuccess() throws ValidationException {
         Film film = new Film();
         film.setName("Name");
         film.setDescription("VeeryLongDescriptionVeeryLongDescriptionVeeryLongDescriptionVeeryLongDescription" +
@@ -107,7 +107,7 @@ class FilmControllerTest {
     }
 
     @Test
-    public void createFilmReleaseDate29December1895Success() {
+    public void createFilmReleaseDate29December1895Success() throws ValidationException {
         Film film = new Film();
         film.setName("Name");
         film.setDescription("Description");
@@ -140,7 +140,7 @@ class FilmControllerTest {
     }
 
     @Test
-    public void updateFilmNewNameIsEmptyThrowsValidationException() {
+    public void updateFilmNewNameIsEmptyThrowsValidationException() throws ValidationException {
         Film film1 = new Film();
         film1.setName("Name1");
         film1.setDescription("Description1");
@@ -158,7 +158,7 @@ class FilmControllerTest {
     }
 
     @Test
-    public void updateFilmNewDescriptionHas201SymbolsThrowsValidationException() {
+    public void updateFilmNewDescriptionHas201SymbolsThrowsValidationException() throws ValidationException {
         Film film1 = new Film();
         film1.setName("Name1");
         film1.setDescription("Description1");
@@ -179,7 +179,7 @@ class FilmControllerTest {
     }
 
     @Test
-    public void updateFilmNewReleaseDateIs27December1895ThrowsValidationException() {
+    public void updateFilmNewReleaseDateIs27December1895ThrowsValidationException() throws ValidationException {
         Film film1 = new Film();
         film1.setName("Name1");
         film1.setDescription("Description1");
@@ -197,7 +197,7 @@ class FilmControllerTest {
     }
 
     @Test
-    public void updateFilmNewDurationIsZeroThrowsValidationException() {
+    public void updateFilmNewDurationIsZeroThrowsValidationException() throws ValidationException {
         Film film1 = new Film();
         film1.setName("Name1");
         film1.setDescription("Description1");
@@ -215,7 +215,7 @@ class FilmControllerTest {
     }
 
     @Test
-    public void updateFilmSuccess() {
+    public void updateFilmSuccess() throws ValidationException {
         Film film1 = new Film();
         film1.setName("Name1");
         film1.setDescription("Description1");
@@ -234,7 +234,7 @@ class FilmControllerTest {
     }
 
     @Test
-    public void createAndGetTwoFilms() {
+    public void createAndGetTwoFilms() throws ValidationException {
         Film film1 = new Film();
         film1.setName("Name1");
         film1.setDescription("Description1");
@@ -253,7 +253,7 @@ class FilmControllerTest {
     }
 
     @Test
-    public void createAndGetFilmById() {
+    public void createAndGetFilmById() throws ValidationException, FilmNotFoundException {
         Film film1 = new Film();
         film1.setName("Name1");
         film1.setDescription("Description1");
@@ -264,7 +264,7 @@ class FilmControllerTest {
     }
 
     @Test
-    public void filmLikedByNonExistedUserThrowUserNotFoundException() {
+    public void filmLikedByNonExistedUserThrowUserNotFoundException() throws ValidationException {
         Film film1 = new Film();
         film1.setName("Name1");
         film1.setDescription("Description1");
@@ -277,7 +277,7 @@ class FilmControllerTest {
     }
 
     @Test
-    public void userLikesNonExistedFilmThrowFilmNotFoundException() {
+    public void userLikesNonExistedFilmThrowFilmNotFoundException() throws ValidationException {
         User user1 = new User();
         user1.setEmail("qwerty@gmail.com");
         user1.setName("UserName");
@@ -290,7 +290,7 @@ class FilmControllerTest {
     }
 
     @Test
-    public void userLikesFilmSuccess() {
+    public void userLikesFilmSuccess() throws ValidationException, UserNotFoundException, FilmNotFoundException {
         User user1 = new User();
         user1.setEmail("qwerty@gmail.com");
         user1.setName("UserName");
@@ -310,7 +310,7 @@ class FilmControllerTest {
     }
 
     @Test
-    public void deleteLikeForFilmByNonExistedUserThrowUserNotFoundException() {
+    public void deleteLikeForFilmByNonExistedUserThrowUserNotFoundException() throws ValidationException {
         Film film1 = new Film();
         film1.setName("Name1");
         film1.setDescription("Description1");
@@ -323,7 +323,7 @@ class FilmControllerTest {
     }
 
     @Test
-    public void deleteLikeForNonExistedFilmThrowFilmNotFoundException() {
+    public void deleteLikeForNonExistedFilmThrowFilmNotFoundException() throws ValidationException {
         User user1 = new User();
         user1.setEmail("qwerty@gmail.com");
         user1.setName("UserName");
@@ -336,7 +336,7 @@ class FilmControllerTest {
     }
 
     @Test
-    public void deleteLikeForFilmSuccess() {
+    public void deleteLikeForFilmSuccess() throws ValidationException, UserNotFoundException, FilmNotFoundException {
         User user1 = new User();
         user1.setEmail("qwerty@gmail.com");
         user1.setName("UserName");
@@ -355,7 +355,7 @@ class FilmControllerTest {
     }
 
     @Test
-    public void getCountAllFilmsWithoutRates() {
+    public void getCountAllFilmsWithoutRates() throws ValidationException {
         Film film1 = new Film();
         film1.setName("Name2");
         film1.setDescription("Description1");
@@ -375,7 +375,7 @@ class FilmControllerTest {
     }
 
     @Test
-    public void getCountOneFilmAllFilmsWithoutRates() {
+    public void getCountOneFilmAllFilmsWithoutRates() throws ValidationException {
         Film film1 = new Film();
         film1.setName("Name2");
         film1.setDescription("Description1");
@@ -394,7 +394,8 @@ class FilmControllerTest {
     }
 
     @Test
-    public void getCountFilmsWithRatingsDifferentRatings() {
+    public void getCountFilmsWithRatingsDifferentRatings()
+            throws ValidationException, UserNotFoundException, FilmNotFoundException {
         Film film1 = new Film();
         film1.setName("Name2");
         film1.setDescription("Description1");
@@ -435,7 +436,8 @@ class FilmControllerTest {
     }
 
     @Test
-    public void getCountFilmsWithRatingsSameRatingsSortByName() {
+    public void getCountFilmsWithRatingsSameRatingsSortByName()
+            throws ValidationException, UserNotFoundException, FilmNotFoundException {
         Film film1 = new Film();
         film1.setName("Name2");
         film1.setDescription("Description1");

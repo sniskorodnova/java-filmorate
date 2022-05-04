@@ -1,10 +1,11 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -15,6 +16,7 @@ import java.util.List;
  */
 @RestController
 @Slf4j
+@RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
@@ -23,17 +25,12 @@ public class UserController {
         return userService;
     }
 
-    @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
-
     /**
      * Метод для получения пользователя по его id
      */
     @GetMapping("/{userId}")
-    public User getById(@PathVariable Long userId) {
-        log.info("Входящий запрос на получение информации по пользователю с id = " + userId);
+    public User getById(@PathVariable Long userId) throws UserNotFoundException {
+        log.debug("Входящий запрос на получение информации по пользователю с id = {}", userId);
         return userService.getById(userId);
     }
 
@@ -41,9 +38,9 @@ public class UserController {
      * Метод для добавления пользователя в друзья другому пользователю
      */
     @PutMapping("/{userId}/friends/{friendId}")
-    public User addToFriends(@PathVariable Long userId, @PathVariable Long friendId) {
-        log.info("Входящий запрос на добавление в друзья пользователя с id = " + friendId + " пользователю "
-                + "c id = " + userId);
+    public User addToFriends(@PathVariable Long userId, @PathVariable Long friendId) throws UserNotFoundException {
+        log.debug("Входящий запрос на добавление в друзья пользователя с id = {} пользователю c id = {}",
+                friendId, userId);
         return userService.addToFriends(userId, friendId);
     }
 
@@ -51,9 +48,9 @@ public class UserController {
      * Метод для удаления пользователя из друзей другого пользователя
      */
     @DeleteMapping("/{userId}/friends/{friendId}")
-    public User deleteFromFriends(@PathVariable Long userId, @PathVariable Long friendId) {
-        log.info("Входящий запрос на удаление из друзей пользователя с id = " + friendId + " у пользователя "
-                + "c id = " + userId);
+    public User deleteFromFriends(@PathVariable Long userId, @PathVariable Long friendId) throws UserNotFoundException {
+        log.debug("Входящий запрос на удаление из друзей пользователя с id = {} у пользователя c id = {}",
+                friendId, userId);
         return userService.deleteFromFriends(userId, friendId);
     }
 
@@ -61,8 +58,8 @@ public class UserController {
      * Метод для получения списка друзей пользователя
      */
     @GetMapping("/{userId}/friends")
-    public List<User> getFriendsForUser(@PathVariable Long userId) {
-        log.info("Входящий запрос на получения списка друзей для пользователя с id = " + userId);
+    public List<User> getFriendsForUser(@PathVariable Long userId) throws UserNotFoundException {
+        log.debug("Входящий запрос на получения списка друзей для пользователя с id = {}", userId);
         return userService.getFriendsForUser(userId);
     }
 
@@ -70,9 +67,10 @@ public class UserController {
      * Метод для получения списка общих друзей для двух пользователей
      */
     @GetMapping("/{userId}/friends/common/{otherUserId}")
-    public List<User> getCommonFriends(@PathVariable Long userId, @PathVariable Long otherUserId) {
-        log.info("Входящий запрос на получения списка общих друзей для пользователей с id = "
-                + userId + " и пользователя с id = " + otherUserId);
+    public List<User> getCommonFriends(@PathVariable Long userId, @PathVariable Long otherUserId)
+            throws UserNotFoundException {
+        log.debug("Входящий запрос на получения списка общих друзей для пользователей с id = {} и пользователя "
+                + "с id = {}", userId, otherUserId);
         return userService.getCommonFriends(userId, otherUserId);
     }
 
@@ -81,7 +79,7 @@ public class UserController {
      */
     @GetMapping
     public List<User> getAll() {
-        log.info("Входящий запрос на получение списка всех пользователей");
+        log.debug("Входящий запрос на получение списка всех пользователей");
         return userService.getAll();
     }
 
@@ -89,9 +87,9 @@ public class UserController {
      * Метод для создания нового пользователя
      */
     @PostMapping
-    public User create(@RequestBody User user) {
-        log.info("Входящий запрос на создание пользователя");
-        log.info(user.toString());
+    public User create(@RequestBody User user) throws ValidationException {
+        log.debug("Входящий запрос на создание пользователя");
+        log.debug(user.toString());
         return userService.create(user);
     }
 
@@ -100,9 +98,9 @@ public class UserController {
      * id пользователя, который нужно отредактировать
      */
     @PutMapping
-    public User update(@RequestBody User user) {
-        log.info("Входящий запрос на редактирование пользователя");
-        log.info(user.toString());
+    public User update(@RequestBody User user) throws ValidationException {
+        log.debug("Входящий запрос на редактирование пользователя");
+        log.debug(user.toString());
         return userService.update(user);
     }
 
