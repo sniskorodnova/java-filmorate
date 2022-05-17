@@ -43,3 +43,74 @@ GET /films/popular - получение топа самых популярных
 - продолжительность фильма должна быть положительной
 
 В приложении добавлено логирование запросов, а также логирование исключений при некорректных входящих данных.
+
+![DB Schema](./QuickDBD-Filmorate.png)
+
+Одному фильму соответствует один рейтинг. Также каждому фильму может соответствовать один или несколько жанров. Жанры
+и фильмы связаны через таблицу film_genre.
+Лайки пользователей для фильмов связаны через таблицу user_film_likes.
+Таблица friendship_suggestion содержит записи о пользователях, которые отправили запрос на добавление в друзья.
+Таблица friendship содержит записи о пользователях, которые дружат друг с другом.
+Если user1 делает запрос на добавление в друзья для user2 и в таблицах friendship_suggestion и friendship
+нет записей [[id], user1, user2] или [[id], user2, user1], то делаем новую запись в таблице friendship_suggestion.
+Если какая-либо из этих записей есть в какой-либо из таблиц friendship_suggestion и friendship, то запись не добавляем.
+Если user2 делает запрос в друзья для user1 - проверяем по таблице friendship_suggestion есть ли запись
+[[id], user1, user2]. Если такая есть - то удаляем ее из таблицы, а в таблицу friendship добавляем новую запись
+[[id], user1, user2].
+
+Примеры запросов для выборки данных:  
+1. Получить все фильмы  
+```
+SELECT name  
+FROM film;  
+```
+
+2. Получить список первых N фильмов по количеству лайков  
+```
+SELECT f.film_id, f.film_name, COUNT(u.user_id) AS likes_count  
+FROM film f  
+LEFT OUTER JOIN user_film_likes u ON f.film_id = u.film_id  
+GROUP BY f.film_id  
+ORDER BY likes_count DESC  
+LIMIT N;  
+```
+
+3. Получить всех пользователей  
+```
+SELECT name  
+FROM user;  
+```
+
+4. Получить список друзей пользователя "пользователь_id"  
+```
+SELECT u.name  
+FROM (SELECT user1_id AS user_id  
+      FROM friendship  
+      WHERE user2_id = [пользователь_id]  
+      UNION ALL  
+      SELECT user2_id AS user_id  
+      FROM friendship  
+      WHERE user1_id = [пользователь_id]) AS users_id  
+INNER JOIN user u ON u.user_id = users_id.user_id;  
+```
+
+5. Получить список общих друзей двух пользователей [пользователь1_id] и [пользователь2_id]
+```
+SELECT u.name  
+FROM ((SELECT user1_id AS user_id  
+      FROM friendship  
+      WHERE user2_id = [пользователь1_id]  
+      UNION ALL  
+      SELECT user2_id AS user_id  
+      FROM friendship  
+      WHERE user1_id = [пользователь1_id]) AS user1_friends)  
+      INTERSECT  
+      (SELECT user1_id AS user_id  
+      FROM friendship  
+      WHERE user2_id = [пользователь2_id]  
+      UNION ALL  
+      SELECT user2_id AS user_id  
+      FROM friendship  
+      WHERE user1_id = [пользователь2_id]) AS user2_friends)) AS common_friends  
+INNER JOIN user u ON u.user_id = common_users.user_id;
+```  
