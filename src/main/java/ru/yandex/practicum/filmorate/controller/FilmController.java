@@ -50,7 +50,7 @@ public class FilmController {
      * который нужно отредактировать
      */
     @PutMapping
-    public Film update(@RequestBody Film film) throws ValidationException {
+    public Film update(@RequestBody Film film) throws ValidationException, FilmNotFoundException {
         log.debug("Входящий запрос на редактирование фильма");
         log.debug(film.toString());
         return filmService.update(film);

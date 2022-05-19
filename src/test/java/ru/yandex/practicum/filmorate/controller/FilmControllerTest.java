@@ -215,7 +215,7 @@ class FilmControllerTest {
     }
 
     @Test
-    public void updateFilmSuccess() throws ValidationException {
+    public void updateFilmSuccess() throws ValidationException, FilmNotFoundException {
         Film film1 = new Film();
         film1.setName("Name1");
         film1.setDescription("Description1");
