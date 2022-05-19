@@ -50,9 +50,13 @@ public class UserService {
      * Метод для редактирования существующего пользователя. Перед редактированием новый объект пользователя
      * валидируется
      */
-    public User update(User user) throws ValidationException {
-        validate(user);
-       return userStorage.update(user);
+    public User update(User user) throws ValidationException, UserNotFoundException {
+        if (userStorage.getById(user.getId()) != null) {
+            validate(user);
+            return userStorage.update(user);
+        } else {
+            throw new UserNotFoundException("User with id = " + user.getId() + " not found");
+        }
     }
 
     /**

@@ -51,9 +51,13 @@ public class FilmService {
     /**
      * Метод редактирования существующего фильма. Перед редактированием новый объект фильма валидируется
      */
-    public Film update(Film film) throws ValidationException {
-        validate(film);
-        return filmStorage.update(film);
+    public Film update(Film film) throws ValidationException, FilmNotFoundException {
+        if (filmStorage.getById(film.getId()) != null) {
+            validate(film);
+            return filmStorage.update(film);
+        } else {
+            throw new FilmNotFoundException("Film with id = " + film.getId() + " not found");
+        }
     }
 
     /**

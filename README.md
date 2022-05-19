@@ -44,19 +44,19 @@ GET /films/popular - получение топа самых популярных
 
 В приложении добавлено логирование запросов, а также логирование исключений при некорректных входящих данных.
 
+![DB Schema](./DB schema.png)
 ![DB Schema](./QuickDBD-Filmorate.png)
 
 Одному фильму соответствует один рейтинг. Также каждому фильму может соответствовать один или несколько жанров. Жанры
 и фильмы связаны через таблицу film_genre.
 Лайки пользователей для фильмов связаны через таблицу user_film_likes.
-Таблица friendship_suggestion содержит записи о пользователях, которые отправили запрос на добавление в друзья.
-Таблица friendship содержит записи о пользователях, которые дружат друг с другом.
-Если user1 делает запрос на добавление в друзья для user2 и в таблицах friendship_suggestion и friendship
-нет записей [[id], user1, user2] или [[id], user2, user1], то делаем новую запись в таблице friendship_suggestion.
-Если какая-либо из этих записей есть в какой-либо из таблиц friendship_suggestion и friendship, то запись не добавляем.
-Если user2 делает запрос в друзья для user1 - проверяем по таблице friendship_suggestion есть ли запись
-[[id], user1, user2]. Если такая есть - то удаляем ее из таблицы, а в таблицу friendship добавляем новую запись
-[[id], user1, user2].
+Таблица friendship содержит записи о пользователях, которые дружат друг с другом или отправили запрос на добавление
+в друзья (флаг confirmed = true, если пользователи дружат, confirmed = false - если отправлен запрос от одного
+пользователя, но еще не подтвержден тем, кому отправили запрос).
+Если user1 делает запрос на добавление в друзья для user2 и в таблице friendship
+нет записей [[id], user1, user2, true], [[id], user2, user1, true] или [[id], user1, user2, false], то делаем новую
+запись в таблице friendship. Если user2 добавляет пользователя user1 в друзья, а в таблице friendship уже есть
+запись [[id], user1, user2, false], то меняем флаг для этой записи на true.
 
 Примеры запросов для выборки данных:  
 1. Получить все фильмы  
@@ -84,33 +84,33 @@ FROM user;
 4. Получить список друзей пользователя "пользователь_id"  
 ```
 SELECT u.name  
-FROM (SELECT user1_id AS user_id  
+FROM (SELECT user_id AS user_id  
       FROM friendship  
-      WHERE user2_id = [пользователь_id]  
+      WHERE friend_id = [пользователь_id] AND confirmed = TRUE  
       UNION ALL  
-      SELECT user2_id AS user_id  
+      SELECT friend_id AS user_id  
       FROM friendship  
-      WHERE user1_id = [пользователь_id]) AS users_id  
+      WHERE user_id = [пользователь_id] AND confirmed = TRUE) AS users_id  
 INNER JOIN user u ON u.user_id = users_id.user_id;  
 ```
 
 5. Получить список общих друзей двух пользователей [пользователь1_id] и [пользователь2_id]
 ```
 SELECT u.name  
-FROM ((SELECT user1_id AS user_id  
+FROM ((SELECT user_id AS user_id  
       FROM friendship  
-      WHERE user2_id = [пользователь1_id]  
+      WHERE friend_id = [пользователь1_id] AND confirmed = TRUE  
       UNION ALL  
-      SELECT user2_id AS user_id  
+      SELECT friend_id AS user_id  
       FROM friendship  
-      WHERE user1_id = [пользователь1_id]) AS user1_friends)  
+      WHERE user_id = [пользователь1_id] AND confirmed = TRUE) AS user1_friends)  
       INTERSECT  
-      (SELECT user1_id AS user_id  
+      (SELECT user_id AS user_id  
       FROM friendship  
-      WHERE user2_id = [пользователь2_id]  
+      WHERE friend_id = [пользователь2_id] AND confirmed = TRUE    
       UNION ALL  
-      SELECT user2_id AS user_id  
+      SELECT friend_id AS user_id  
       FROM friendship  
-      WHERE user1_id = [пользователь2_id]) AS user2_friends)) AS common_friends  
+      WHERE user_id = [пользователь2_id] AND confirmed = TRUE) AS user2_friends)) AS common_friends  
 INNER JOIN user u ON u.user_id = common_users.user_id;
 ```  

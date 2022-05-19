@@ -98,7 +98,7 @@ public class UserController {
      * id пользователя, который нужно отредактировать
      */
     @PutMapping
-    public User update(@RequestBody User user) throws ValidationException {
+    public User update(@RequestBody User user) throws ValidationException, UserNotFoundException {
         log.debug("Входящий запрос на редактирование пользователя");
         log.debug(user.toString());
         return userService.update(user);

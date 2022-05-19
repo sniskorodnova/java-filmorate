@@ -145,6 +145,7 @@ class UserControllerTest {
         user1.setBirthday(LocalDate.of(1990, 6, 9));
         user1.setLogin("UserLogin");
         User user2 = new User();
+        user2.setId(1L);
         user2.setEmail("");
         user2.setName("UserName");
         user2.setBirthday(LocalDate.of(1990, 6, 9));
@@ -162,6 +163,7 @@ class UserControllerTest {
         user1.setBirthday(LocalDate.of(1990, 6, 9));
         user1.setLogin("UserLogin");
         User user2 = new User();
+        user2.setId(1L);
         user2.setEmail("gmail.com");
         user2.setName("UserName");
         user2.setBirthday(LocalDate.of(1990, 6, 9));
@@ -179,6 +181,7 @@ class UserControllerTest {
         user1.setBirthday(LocalDate.of(1990, 6, 9));
         user1.setLogin("UserLogin");
         User user2 = new User();
+        user2.setId(1L);
         user2.setEmail("qwerty@gmail.com");
         user2.setName("UserName");
         user2.setBirthday(LocalDate.of(1990, 6, 9));
@@ -197,6 +200,7 @@ class UserControllerTest {
         user1.setBirthday(LocalDate.of(1990, 6, 9));
         user1.setLogin("UserLogin");
         User user2 = new User();
+        user2.setId(1L);
         user2.setEmail("qwerty@gmail.com");
         user2.setName("UserName");
         user2.setBirthday(LocalDate.of(1990, 6, 9));
@@ -215,6 +219,7 @@ class UserControllerTest {
         user1.setBirthday(LocalDate.of(1990, 6, 9));
         user1.setLogin("UserLogin");
         User user2 = new User();
+        user2.setId(1L);
         user2.setEmail("qwerty@gmail.com");
         user2.setName("UserName");
         user2.setBirthday(LocalDate.now().plusDays(1));
@@ -225,13 +230,14 @@ class UserControllerTest {
     }
 
     @Test
-    public void updateUserNewNameIsEmptyNameEqualsLogin() throws ValidationException {
+    public void updateUserNewNameIsEmptyNameEqualsLogin() throws ValidationException, UserNotFoundException {
         User user1 = new User();
         user1.setEmail("qwerty@gmail.com");
         user1.setName("UserName");
         user1.setBirthday(LocalDate.of(1990, 6, 9));
         user1.setLogin("UserLogin");
         User user2 = new User();
+        user2.setId(1L);
         user2.setEmail("qwerty@gmail.com");
         user2.setName("");
         user2.setBirthday(LocalDate.of(1990, 6, 9));
@@ -242,7 +248,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void updateUserSuccess() throws ValidationException {
+    public void updateUserSuccess() throws ValidationException, UserNotFoundException {
         User user1 = new User();
         user1.setEmail("qwerty@gmail.com");
         user1.setName("UserName");
