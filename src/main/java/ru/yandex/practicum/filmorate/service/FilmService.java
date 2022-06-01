@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
@@ -8,12 +9,10 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.storage.userfilmlikes.UserFilmLikesStorage;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Класс-сервис, отвечающий за логику работы с фильмами. Для реализации логики используются методы хранилищ
@@ -23,10 +22,14 @@ import java.util.stream.Collectors;
 public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+    private final UserFilmLikesStorage userFilmLikesStorage;
 
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
+                       @Qualifier("userDbStorage") UserStorage userStorage,
+                       @Qualifier("userFilmLikesDbStorage") UserFilmLikesStorage userFilmLikesStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
+        this.userFilmLikesStorage = userFilmLikesStorage;
     }
 
     public FilmStorage getFilmStorage() {
@@ -75,9 +78,8 @@ public class FilmService {
      * Метод для получения списка первых count фильмов в порядке убывания количества лайков
      */
     public List<Film> getCountFilms(int count) {
-        List<Film> films = filmStorage.getAll();
-        films.sort(new FilmComparator());
-        return films.stream().limit(count).collect(Collectors.toList());
+        List<Film> films = userFilmLikesStorage.getCount(count);
+        return films;
     }
 
     /**
@@ -91,12 +93,7 @@ public class FilmService {
         } else if (userStorage.getById(userId) == null) {
             throw new UserNotFoundException("User with id = " + userId + " not found");
         } else {
-            Set<Long> idLikesFilm = new HashSet<>();
-            if (film.getLikesFromUsers() != null) {
-                idLikesFilm = film.getLikesFromUsers();
-            }
-            idLikesFilm.add(userId);
-            film.setLikesFromUsers(idLikesFilm);
+            userFilmLikesStorage.saveLike(filmId, userId);
             return filmStorage.update(film);
         }
     }
@@ -111,12 +108,7 @@ public class FilmService {
         } else if (userStorage.getById(userId) == null) {
             throw new UserNotFoundException("User with id = " + userId + " not found");
         } else {
-            Set<Long> idLikesFilm = new HashSet<>();
-            if (film.getLikesFromUsers() != null) {
-                idLikesFilm = film.getLikesFromUsers();
-            }
-            idLikesFilm.remove(userId);
-            film.setLikesFromUsers(idLikesFilm);
+            userFilmLikesStorage.removeLike(filmId, userId);
             return filmStorage.update(film);
         }
     }
@@ -139,6 +131,9 @@ public class FilmService {
         } else if (film.getDuration() <= 0) {
             log.debug("Произошла ошибка валидации для фильма:");
             throw new ValidationException("Продолжительность фильма не может быть отрицательной или равной нулю");
+        } else if (film.getMpa() == null) {
+            log.debug("Произошла ошибка валидации для фильма:");
+            throw new ValidationException("MPAA рейтинг фильма должен быть заполнен");
         }
     }
 }
