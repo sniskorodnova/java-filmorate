@@ -28,44 +28,32 @@ class UserControllerTest {
 
     @Test
     public void createUserEmptyEmailThrowsValidationException() {
-        User user = new User();
-        user.setEmail("");
-        user.setName("UserName");
-        user.setBirthday(LocalDate.of(1990, 6, 9));
-        user.setLogin("UserLogin");
+        User user = User.builder().email("").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
         ValidationException ex = assertThrows(ValidationException.class, () -> userController.create(user));
         assertEquals("Почта пользователя не может быть пустой и должна содержать символ @", ex.getMessage());
     }
 
     @Test
     public void createUserInvalidEmailThrowsValidationException() {
-        User user = new User();
-        user.setEmail("qwerty.wsx");
-        user.setName("UserName");
-        user.setBirthday(LocalDate.of(1990, 6, 9));
-        user.setLogin("UserLogin");
+        User user = User.builder().email("qwerty.wsx").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
         ValidationException ex = assertThrows(ValidationException.class, () -> userController.create(user));
         assertEquals("Почта пользователя не может быть пустой и должна содержать символ @", ex.getMessage());
     }
 
     @Test
     public void createUserValidEmailSuccess() throws ValidationException {
-        User user = new User();
-        user.setEmail("qwerty@gmail.com");
-        user.setName("UserName");
-        user.setBirthday(LocalDate.of(1990, 6, 9));
-        user.setLogin("UserLogin");
+        User user = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
         userController.create(user);
         assertEquals(1, userController.getAll().size());
     }
 
     @Test
     public void createUserEmptyLoginThrowsValidationException() {
-        User user = new User();
-        user.setEmail("qwerty@gmail.com");
-        user.setName("UserName");
-        user.setBirthday(LocalDate.of(1990, 6, 9));
-        user.setLogin("");
+        User user = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("").build();
         ValidationException ex = assertThrows(ValidationException.class, () -> userController.create(user));
         assertEquals("Логин пользователя не может быть пустым и не должен содержать пробелов",
                 ex.getMessage());
@@ -73,11 +61,8 @@ class UserControllerTest {
 
     @Test
     public void createUserLoginHasSpacesThrowsValidationException() {
-        User user = new User();
-        user.setEmail("qwerty@gmail.com");
-        user.setName("UserName");
-        user.setBirthday(LocalDate.of(1990, 6, 9));
-        user.setLogin("User Login");
+        User user = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("User Login").build();
         ValidationException ex = assertThrows(ValidationException.class, () -> userController.create(user));
         assertEquals("Логин пользователя не может быть пустым и не должен содержать пробелов",
                 ex.getMessage());
@@ -85,71 +70,50 @@ class UserControllerTest {
 
     @Test
     public void createUserValidLoginSuccess() throws ValidationException {
-        User user = new User();
-        user.setEmail("qwerty@gmail.com");
-        user.setName("UserName");
-        user.setBirthday(LocalDate.of(1990, 6, 9));
-        user.setLogin("UserLogin");
+        User user = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
         userController.create(user);
         assertEquals(1, userController.getAll().size());
     }
 
     @Test
     public void createUserInvalidBirthdayThrowsValidationException() {
-        User user = new User();
-        user.setEmail("qwerty@gmail.com");
-        user.setName("UserName");
-        user.setBirthday(LocalDate.now().plusDays(1));
-        user.setLogin("UserLogin");
+        User user = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.now().plusDays(1)).login("UserLogin").build();
         ValidationException ex = assertThrows(ValidationException.class, () -> userController.create(user));
         assertEquals("День рождения пользователя не может быть в будущем", ex.getMessage());
     }
 
     @Test
     public void createUserValidBirthdaySuccess() throws ValidationException {
-        User user = new User();
-        user.setEmail("qwerty@gmail.com");
-        user.setName("UserName");
-        user.setBirthday(LocalDate.now().minusDays(1));
-        user.setLogin("UserLogin");
+        User user = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.now().minusDays(1)).login("UserLogin").build();
         userController.create(user);
         assertEquals(1, userController.getAll().size());
     }
 
     @Test
     public void createUserNameIsEmptyNameEqualsLogin() throws ValidationException {
-        User user = new User();
-        user.setEmail("qwerty@gmail.com");
-        user.setBirthday(LocalDate.of(1990, 6, 9));
-        user.setLogin("UserLogin");
+        User user = User.builder().email("qwerty@gmail.com")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
         userController.create(user);
         assertEquals("UserLogin", userController.getAll().get(0).getName());
     }
 
     @Test
     public void createUserNameHasOnlySpacesNameEqualsLogin() throws ValidationException {
-        User user = new User();
-        user.setEmail("qwerty@gmail.com");
-        user.setBirthday(LocalDate.of(1990, 6, 9));
-        user.setLogin("UserLogin");
-        user.setName("   ");
+        User user = User.builder().email("qwerty@gmail.com").name("   ")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
         userController.create(user);
         assertEquals("UserLogin", userController.getAll().get(0).getName());
     }
 
     @Test
     public void updateUserNewEmptyEmailThrowsValidationException() throws ValidationException {
-        User user1 = new User();
-        user1.setEmail("qwerty@gmail.com");
-        user1.setName("UserName");
-        user1.setBirthday(LocalDate.of(1990, 6, 9));
-        user1.setLogin("UserLogin");
-        User user2 = new User();
-        user2.setId(1L);
-        user2.setEmail("");
-        user2.setName("UserName");
-        user2.setBirthday(LocalDate.of(1990, 6, 9));
-        user2.setLogin("UserLogin");
+        User user1 = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
+        User user2 = User.builder().id(1L).email("").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
         userController.create(user1);
         ValidationException ex = assertThrows(ValidationException.class, () -> userController.update(user2));
         assertEquals("Почта пользователя не может быть пустой и должна содержать символ @", ex.getMessage());
@@ -157,17 +121,10 @@ class UserControllerTest {
 
     @Test
     public void updateUserNewInvalidEmailThrowsValidationException() throws ValidationException {
-        User user1 = new User();
-        user1.setEmail("qwerty@gmail.com");
-        user1.setName("UserName");
-        user1.setBirthday(LocalDate.of(1990, 6, 9));
-        user1.setLogin("UserLogin");
-        User user2 = new User();
-        user2.setId(1L);
-        user2.setEmail("gmail.com");
-        user2.setName("UserName");
-        user2.setBirthday(LocalDate.of(1990, 6, 9));
-        user2.setLogin("UserLogin");
+        User user1 = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
+        User user2 = User.builder().id(1L).email("gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
         userController.create(user1);
         ValidationException ex = assertThrows(ValidationException.class, () -> userController.update(user2));
         assertEquals("Почта пользователя не может быть пустой и должна содержать символ @", ex.getMessage());
@@ -175,17 +132,10 @@ class UserControllerTest {
 
     @Test
     public void updateUserNewEmptyLoginThrowsValidationException() throws ValidationException {
-        User user1 = new User();
-        user1.setEmail("qwerty@gmail.com");
-        user1.setName("UserName");
-        user1.setBirthday(LocalDate.of(1990, 6, 9));
-        user1.setLogin("UserLogin");
-        User user2 = new User();
-        user2.setId(1L);
-        user2.setEmail("qwerty@gmail.com");
-        user2.setName("UserName");
-        user2.setBirthday(LocalDate.of(1990, 6, 9));
-        user2.setLogin("");
+        User user1 = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
+        User user2 = User.builder().id(1L).email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("").build();
         userController.create(user1);
         ValidationException ex = assertThrows(ValidationException.class, () -> userController.update(user2));
         assertEquals("Логин пользователя не может быть пустым и не должен содержать пробелов",
@@ -194,17 +144,10 @@ class UserControllerTest {
 
     @Test
     public void updateUserNewLoginHasSpacesThrowsValidationException() throws ValidationException {
-        User user1 = new User();
-        user1.setEmail("qwerty@gmail.com");
-        user1.setName("UserName");
-        user1.setBirthday(LocalDate.of(1990, 6, 9));
-        user1.setLogin("UserLogin");
-        User user2 = new User();
-        user2.setId(1L);
-        user2.setEmail("qwerty@gmail.com");
-        user2.setName("UserName");
-        user2.setBirthday(LocalDate.of(1990, 6, 9));
-        user2.setLogin("Log in");
+        User user1 = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
+        User user2 = User.builder().id(1L).email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("Log in").build();
         userController.create(user1);
         ValidationException ex = assertThrows(ValidationException.class, () -> userController.update(user2));
         assertEquals("Логин пользователя не может быть пустым и не должен содержать пробелов",
@@ -213,17 +156,10 @@ class UserControllerTest {
 
     @Test
     public void updateUserNewBirthdayIsAfterNowThrowsValidationException() throws ValidationException {
-        User user1 = new User();
-        user1.setEmail("qwerty@gmail.com");
-        user1.setName("UserName");
-        user1.setBirthday(LocalDate.of(1990, 6, 9));
-        user1.setLogin("UserLogin");
-        User user2 = new User();
-        user2.setId(1L);
-        user2.setEmail("qwerty@gmail.com");
-        user2.setName("UserName");
-        user2.setBirthday(LocalDate.now().plusDays(1));
-        user2.setLogin("UserLogin");
+        User user1 = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
+        User user2 = User.builder().id(1L).email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.now().plusDays(1)).login("UserLogin").build();
         userController.create(user1);
         ValidationException ex = assertThrows(ValidationException.class, () -> userController.update(user2));
         assertEquals("День рождения пользователя не может быть в будущем", ex.getMessage());
@@ -231,17 +167,10 @@ class UserControllerTest {
 
     @Test
     public void updateUserNewNameIsEmptyNameEqualsLogin() throws ValidationException, UserNotFoundException {
-        User user1 = new User();
-        user1.setEmail("qwerty@gmail.com");
-        user1.setName("UserName");
-        user1.setBirthday(LocalDate.of(1990, 6, 9));
-        user1.setLogin("UserLogin");
-        User user2 = new User();
-        user2.setId(1L);
-        user2.setEmail("qwerty@gmail.com");
-        user2.setName("");
-        user2.setBirthday(LocalDate.of(1990, 6, 9));
-        user2.setLogin("UserLogin");
+        User user1 = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
+        User user2 = User.builder().id(1L).email("qwerty@gmail.com").name("")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
         userController.create(user1);
         userController.update(user2);
         assertEquals("UserLogin", userController.getAll().get(0).getName());
@@ -249,17 +178,10 @@ class UserControllerTest {
 
     @Test
     public void updateUserSuccess() throws ValidationException, UserNotFoundException {
-        User user1 = new User();
-        user1.setEmail("qwerty@gmail.com");
-        user1.setName("UserName");
-        user1.setBirthday(LocalDate.of(1990, 6, 9));
-        user1.setLogin("UserLogin");
-        User user2 = new User();
-        user2.setId(1L);
-        user2.setEmail("zxcvb@gmail.com");
-        user2.setName("NewNameUser");
-        user2.setBirthday(LocalDate.of(1988, 5, 9));
-        user2.setLogin("NewUserLogin");
+        User user1 = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
+        User user2 = User.builder().id(1L).email("zxcvb@gmail.com").name("NewNameUser")
+                .birthday(LocalDate.of(1988, 5, 9)).login("NewUserLogin").build();
         userController.create(user1);
         userController.update(user2);
         assertEquals(1, userController.getAll().size());
@@ -268,16 +190,10 @@ class UserControllerTest {
 
     @Test
     public void createAndGetTwoUsers() throws ValidationException {
-        User user1 = new User();
-        user1.setEmail("qwerty@gmail.com");
-        user1.setName("UserName");
-        user1.setBirthday(LocalDate.of(1990, 6, 9));
-        user1.setLogin("UserLogin");
-        User user2 = new User();
-        user2.setEmail("zxcvb@gmail.com");
-        user2.setName("NewNameUser");
-        user2.setBirthday(LocalDate.of(1988, 5, 9));
-        user2.setLogin("NewUserLogin");
+        User user1 = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
+        User user2 = User.builder().email("zxcvb@gmail.com").name("NewNameUser")
+                .birthday(LocalDate.of(1988, 5, 9)).login("NewUserLogin").build();
         userController.create(user1);
         userController.create(user2);
         assertEquals(2, userController.getAll().size());
@@ -287,11 +203,8 @@ class UserControllerTest {
 
     @Test
     public void createAndGetUserById() throws ValidationException, UserNotFoundException {
-        User user = new User();
-        user.setEmail("qwerty@gmail.com");
-        user.setName("UserName");
-        user.setBirthday(LocalDate.of(1990, 6, 9));
-        user.setLogin("UserLogin");
+        User user = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
         userController.create(user);
         User getUser = userController.getById(1L);
         assertEquals(getUser, user);
@@ -305,11 +218,8 @@ class UserControllerTest {
 
     @Test
     public void addFriendToNonExistedUserThrowNotFoundUserException() throws ValidationException {
-        User user1 = new User();
-        user1.setEmail("qwerty@gmail.com");
-        user1.setName("UserName");
-        user1.setBirthday(LocalDate.of(1990, 6, 9));
-        user1.setLogin("UserLogin");
+        User user1 = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
         userController.create(user1);
         UserNotFoundException ex = assertThrows(UserNotFoundException.class, ()
                 -> userController.addToFriends(3L, 1L));
@@ -318,11 +228,8 @@ class UserControllerTest {
 
     @Test
     public void addNonExistedFriendToUserThrowNotFoundUserException() throws ValidationException {
-        User user1 = new User();
-        user1.setEmail("qwerty@gmail.com");
-        user1.setName("UserName");
-        user1.setBirthday(LocalDate.of(1990, 6, 9));
-        user1.setLogin("UserLogin");
+        User user1 = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
         userController.create(user1);
         UserNotFoundException ex = assertThrows(UserNotFoundException.class, ()
                 -> userController.addToFriends(1L, 2L));
@@ -331,16 +238,10 @@ class UserControllerTest {
 
     @Test
     public void addFriendToUserSuccess() throws ValidationException, UserNotFoundException {
-        User user1 = new User();
-        user1.setEmail("qwerty@gmail.com");
-        user1.setName("UserName");
-        user1.setBirthday(LocalDate.of(1990, 6, 9));
-        user1.setLogin("UserLogin");
-        User user2 = new User();
-        user2.setEmail("zxcvb@gmail.com");
-        user2.setName("NewNameUser");
-        user2.setBirthday(LocalDate.of(1988, 5, 9));
-        user2.setLogin("NewUserLogin");
+        User user1 = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
+        User user2 = User.builder().email("zxcvb@gmail.com").name("NewNameUser")
+                .birthday(LocalDate.of(1988, 5, 9)).login("NewUserLogin").build();
         userController.create(user1);
         userController.create(user2);
         userController.addToFriends(1L, 2L);
@@ -349,11 +250,8 @@ class UserControllerTest {
 
     @Test
     public void deleteFriendFromNonExistedUserThrowNotFoundUserException() throws ValidationException {
-        User user1 = new User();
-        user1.setEmail("qwerty@gmail.com");
-        user1.setName("UserName");
-        user1.setBirthday(LocalDate.of(1990, 6, 9));
-        user1.setLogin("UserLogin");
+        User user1 = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
         userController.create(user1);
         UserNotFoundException ex = assertThrows(UserNotFoundException.class, ()
                 -> userController.deleteFromFriends(3L, 1L));
@@ -362,11 +260,8 @@ class UserControllerTest {
 
     @Test
     public void deleteNonExistedFriendFromUserThrowNotFoundUserException() throws ValidationException {
-        User user1 = new User();
-        user1.setEmail("qwerty@gmail.com");
-        user1.setName("UserName");
-        user1.setBirthday(LocalDate.of(1990, 6, 9));
-        user1.setLogin("UserLogin");
+        User user1 = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
         userController.create(user1);
         UserNotFoundException ex = assertThrows(UserNotFoundException.class, ()
                 -> userController.deleteFromFriends(1L, 2L));
@@ -375,16 +270,10 @@ class UserControllerTest {
 
     @Test
     public void deleteFriendFromUserSuccess() throws ValidationException, UserNotFoundException {
-        User user1 = new User();
-        user1.setEmail("qwerty@gmail.com");
-        user1.setName("UserName");
-        user1.setBirthday(LocalDate.of(1990, 6, 9));
-        user1.setLogin("UserLogin");
-        User user2 = new User();
-        user2.setEmail("zxcvb@gmail.com");
-        user2.setName("NewNameUser");
-        user2.setBirthday(LocalDate.of(1988, 5, 9));
-        user2.setLogin("NewUserLogin");
+        User user1 = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
+        User user2 = User.builder().email("zxcvb@gmail.com").name("NewNameUser")
+                .birthday(LocalDate.of(1988, 5, 9)).login("NewUserLogin").build();
         userController.create(user1);
         userController.create(user2);
         userController.addToFriends(1L, 2L);
@@ -394,32 +283,23 @@ class UserControllerTest {
 
     @Test
     public void getFriendsForUserNoFriends() throws ValidationException, UserNotFoundException {
-        User user1 = new User();
-        user1.setEmail("qwerty@gmail.com");
-        user1.setName("UserName");
-        user1.setBirthday(LocalDate.of(1990, 6, 9));
-        user1.setLogin("UserLogin");
+        User user1 = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
         userController.create(user1);
         assertEquals(0,userController.getFriendsForUser(1L).size());
     }
 
     @Test
     public void getFriendsForUserOneFriend() throws ValidationException, UserNotFoundException {
-        User user1 = new User();
-        user1.setEmail("qwerty@gmail.com");
-        user1.setName("UserName");
-        user1.setBirthday(LocalDate.of(1990, 6, 9));
-        user1.setLogin("UserLogin");
-        User user2 = new User();
-        user2.setEmail("zxcvb@gmail.com");
-        user2.setName("NewNameUser");
-        user2.setBirthday(LocalDate.of(1988, 5, 9));
-        user2.setLogin("NewUserLogin");
+        User user1 = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
+        User user2 = User.builder().email("zxcvb@gmail.com").name("NewNameUser")
+                .birthday(LocalDate.of(1988, 5, 9)).login("NewUserLogin").build();
         userController.create(user1);
         userController.create(user2);
         userController.addToFriends(1L, 2L);
         assertEquals(1,userController.getFriendsForUser(1L).size());
-        assertEquals(1,userController.getFriendsForUser(2L).size());
+        assertEquals(0,userController.getFriendsForUser(2L).size());
     }
 
     @Test
@@ -431,16 +311,10 @@ class UserControllerTest {
 
     @Test
     public void getCommonFriendsNoFriends() throws ValidationException, UserNotFoundException {
-        User user1 = new User();
-        user1.setEmail("qwerty@gmail.com");
-        user1.setName("UserName");
-        user1.setBirthday(LocalDate.of(1990, 6, 9));
-        user1.setLogin("UserLogin");
-        User user2 = new User();
-        user2.setEmail("zxcvb@gmail.com");
-        user2.setName("NewNameUser");
-        user2.setBirthday(LocalDate.of(1988, 5, 9));
-        user2.setLogin("NewUserLogin");
+        User user1 = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
+        User user2 = User.builder().email("zxcvb@gmail.com").name("NewNameUser")
+                .birthday(LocalDate.of(1988, 5, 9)).login("NewUserLogin").build();
         userController.create(user1);
         userController.create(user2);
         assertEquals(0, userController.getCommonFriends(1L, 2L).size());
@@ -448,11 +322,8 @@ class UserControllerTest {
 
     @Test
     public void getCommonFriendsFroNonExistedUserThrowUserNotFoundException() throws ValidationException {
-        User user1 = new User();
-        user1.setEmail("qwerty@gmail.com");
-        user1.setName("UserName");
-        user1.setBirthday(LocalDate.of(1990, 6, 9));
-        user1.setLogin("UserLogin");
+        User user1 = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
         userController.create(user1);
         UserNotFoundException ex = assertThrows(UserNotFoundException.class, ()
                 -> userController.getCommonFriends(2L, 1L));
@@ -461,11 +332,8 @@ class UserControllerTest {
 
     @Test
     public void getCommonFriendsFroNonExistedOtherUser() throws ValidationException {
-        User user1 = new User();
-        user1.setEmail("qwerty@gmail.com");
-        user1.setName("UserName");
-        user1.setBirthday(LocalDate.of(1990, 6, 9));
-        user1.setLogin("UserLogin");
+        User user1 = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
         userController.create(user1);
         UserNotFoundException ex = assertThrows(UserNotFoundException.class, ()
                 -> userController.getCommonFriends(1L, 3L));
@@ -474,23 +342,14 @@ class UserControllerTest {
 
     @Test
     public void getCommonFriendsOneFriend() throws ValidationException, UserNotFoundException {
-        User user1 = new User();
-        user1.setEmail("qwerty@gmail.com");
-        user1.setName("UserName");
-        user1.setBirthday(LocalDate.of(1990, 6, 9));
-        user1.setLogin("UserLogin");
-        User user2 = new User();
-        user2.setEmail("zxcvb@gmail.com");
-        user2.setName("NewNameUser");
-        user2.setBirthday(LocalDate.of(1988, 5, 9));
-        user2.setLogin("NewUserLogin");
+        User user1 = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
+        User user2 = User.builder().email("zxcvb@gmail.com").name("NewNameUser")
+                .birthday(LocalDate.of(1988, 5, 9)).login("NewUserLogin").build();
         userController.create(user1);
         userController.create(user2);
-        User user3 = new User();
-        user3.setEmail("test@gmail.com");
-        user3.setName("User2Name");
-        user3.setBirthday(LocalDate.of(1996, 1, 1));
-        user3.setLogin("User3Login");
+        User user3 = User.builder().email("test@gmail.com").name("User2Name")
+                .birthday(LocalDate.of(1996, 1, 1)).login("User3Login").build();
         userController.create(user3);
         userController.addToFriends(1L, 3L);
         userController.addToFriends(2L, 3L);

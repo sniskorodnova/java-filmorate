@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.Builder;
 import lombok.Data;
 import java.time.LocalDate;
 import java.util.Set;
@@ -9,6 +10,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * Класс, описывающий сущность пользователь
  */
 @Data
+@Builder
 public class User {
     private Long id;
     private String email;

@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
@@ -38,45 +39,37 @@ class FilmControllerTest {
 
     @Test
     public void createFilmWithoutNameThrowsValidationException() {
-        Film film = new Film();
-        film.setDescription("Description");
-        film.setReleaseDate(LocalDate.of(2000, 2, 26));
-        film.setDuration(125L);
+        Film film = Film.builder().description("Description")
+                .releaseDate(LocalDate.of(2000, 2, 26)).duration(125L).build();
         ValidationException ex = assertThrows(ValidationException.class, () -> filmController.create(film));
         assertEquals("Имя фильма не может быть пустым", ex.getMessage());
     }
 
     @Test
     public void createFilmNameConsistsOfSpacesThrowsValidationException() {
-        Film film = new Film();
-        film.setName(" ");
-        film.setDescription("Description");
-        film.setReleaseDate(LocalDate.of(2000, 2, 26));
-        film.setDuration(125L);
+        Film film = Film.builder().name(" ").description("Description")
+                .releaseDate(LocalDate.of(2000, 2, 26)).duration(125L).build();
         ValidationException ex = assertThrows(ValidationException.class, () -> filmController.create(film));
         assertEquals("Имя фильма не может быть пустым", ex.getMessage());
     }
 
     @Test
     public void createValidFilmNameSuccess() throws ValidationException {
-        Film film = new Film();
-        film.setName("Name");
-        film.setDescription("Description");
-        film.setReleaseDate(LocalDate.of(2000, 2, 26));
-        film.setDuration(125L);
+        Film film = Film.builder().name("Name").description("Description")
+                .releaseDate(LocalDate.of(2000, 2, 26)).duration(125L)
+                .mpa(Mpa.builder().id(3).build()).build();
         filmController.create(film);
         assertEquals(1, filmController.getAll().size());
     }
 
     @Test
     public void createFilmDescriptionHas201SymbolsThrowsValidationException() {
-        Film film = new Film();
-        film.setName("Name");
-        film.setDescription("VeeryLongDescriptionVeeryLongDescriptionVeeryLongDescriptionVeeryLongDescription" +
-                "VeeryLongDescriptionVeeryLongDescriptionVeeryLongDescriptionVeeryLongDescriptionVeeryLongDescription" +
-                "VeeryLongDescription1");
-        film.setReleaseDate(LocalDate.of(2000, 2, 26));
-        film.setDuration(125L);
+        Film film = Film.builder().name("Name")
+                .description("VeeryLongDescriptionVeeryLongDescriptionVeeryLongDescriptionVeeryLongDescription"
+                        + "VeeryLongDescriptionVeeryLongDescriptionVeeryLongDescriptionVeeryLongDescriptionVeery"
+                        + "LongDescriptionVeeryLongDescription1")
+                .releaseDate(LocalDate.of(2000, 2, 26)).duration(125L)
+                .mpa(Mpa.builder().id(3).build()).build();
         ValidationException ex = assertThrows(ValidationException.class, () -> filmController.create(film));
         assertEquals("Описание фильма должно содержать символы и не может быть больше 200 символов",
                 ex.getMessage());
@@ -84,95 +77,77 @@ class FilmControllerTest {
 
     @Test
     public void createFilmDescriptionHas200SymbolsSuccess() throws ValidationException {
-        Film film = new Film();
-        film.setName("Name");
-        film.setDescription("VeeryLongDescriptionVeeryLongDescriptionVeeryLongDescriptionVeeryLongDescription" +
-                "VeeryLongDescriptionVeeryLongDescriptionVeeryLongDescriptionVeeryLongDescriptionVeeryLongDescription" +
-                "VeeryLongDescription");
-        film.setReleaseDate(LocalDate.of(2000, 2, 26));
-        film.setDuration(125L);
+        Film film = Film.builder().name("Name")
+                .description("VeeryLongDescriptionVeeryLongDescriptionVeeryLongDescriptionVeeryLongDescription"
+                        + "VeeryLongDescriptionVeeryLongDescriptionVeeryLongDescriptionVeeryLongDescriptionVeery"
+                        + "LongDescriptionVeeryLongDescription")
+                .releaseDate(LocalDate.of(2000, 2, 26)).duration(125L)
+                .mpa(Mpa.builder().id(3).build()).build();
         filmController.create(film);
         assertEquals(1, filmController.getAll().size());
     }
 
     @Test
     public void createFilmReleaseDate27December1895ThrowsValidationException() {
-        Film film = new Film();
-        film.setName("Name");
-        film.setDescription("Description");
-        film.setReleaseDate(LocalDate.of(1895, 12, 27));
-        film.setDuration(125L);
+        Film film = Film.builder().name("Name").description("Description")
+                .releaseDate(LocalDate.of(1895, 12, 27)).duration(125L)
+                .mpa(Mpa.builder().id(3).build()).build();
         ValidationException ex = assertThrows(ValidationException.class, () -> filmController.create(film));
         assertEquals("Дата выхода фильма не может быть раньше 28 декабря 1895 года", ex.getMessage());
     }
 
     @Test
     public void createFilmReleaseDate29December1895Success() throws ValidationException {
-        Film film = new Film();
-        film.setName("Name");
-        film.setDescription("Description");
-        film.setReleaseDate(LocalDate.of(1895, 12, 29));
-        film.setDuration(125L);
+        Film film = Film.builder().name("Name").description("Description")
+                .releaseDate(LocalDate.of(1895, 12, 29)).duration(125L)
+                .mpa(Mpa.builder().id(3).build()).build();
         filmController.create(film);
         assertEquals(1, filmController.getAll().size());
     }
 
     @Test
     public void createFilmDurationIsZeroThrowsValidationException() {
-        Film film = new Film();
-        film.setName("Name");
-        film.setDescription("Description");
-        film.setReleaseDate(LocalDate.of(1995, 12, 27));
-        film.setDuration(0L);
+        Film film = Film.builder().name("Name").description("Description")
+                .releaseDate(LocalDate.of(1995, 12, 27)).duration(0L)
+                .mpa(Mpa.builder().id(3).build()).build();
         ValidationException ex = assertThrows(ValidationException.class, () -> filmController.create(film));
         assertEquals("Продолжительность фильма не может быть отрицательной или равной нулю", ex.getMessage());
     }
 
     @Test
     public void createFilmDurationIsNegativeThrowsValidationException() {
-        Film film = new Film();
-        film.setName("Name");
-        film.setDescription("Description");
-        film.setReleaseDate(LocalDate.of(1995, 12, 27));
-        film.setDuration(-150L);
+        Film film = Film.builder().name("Name").description("Description")
+                .releaseDate(LocalDate.of(1995, 12, 27)).duration(-150L)
+                .mpa(Mpa.builder().id(3).build()).build();
         ValidationException ex = assertThrows(ValidationException.class, () -> filmController.create(film));
         assertEquals("Продолжительность фильма не может быть отрицательной или равной нулю", ex.getMessage());
     }
 
     @Test
     public void updateFilmNewNameIsEmptyThrowsValidationException() throws ValidationException {
-        Film film1 = new Film();
-        film1.setName("Name1");
-        film1.setDescription("Description1");
-        film1.setReleaseDate(LocalDate.of(1995, 12, 27));
-        film1.setDuration(150L);
+        Film film1 = Film.builder().name("Name1").description("Description1")
+                .releaseDate(LocalDate.of(1995, 12, 27)).duration(150L)
+                .mpa(Mpa.builder().id(3).build()).build();
         filmController.create(film1);
-        Film film2 = new Film();
-        film2.setId(1L);
-        film2.setName("");
-        film2.setDescription("Description2");
-        film2.setReleaseDate(LocalDate.of(1995, 12, 27));
-        film2.setDuration(150L);
+        Film film2 = Film.builder().id(1L).name("").description("Description2")
+                .releaseDate(LocalDate.of(1995, 12, 27)).duration(150L)
+                .mpa(Mpa.builder().id(3).build()).build();
         ValidationException ex = assertThrows(ValidationException.class, () -> filmController.update(film2));
         assertEquals("Имя фильма не может быть пустым", ex.getMessage());
     }
 
     @Test
     public void updateFilmNewDescriptionHas201SymbolsThrowsValidationException() throws ValidationException {
-        Film film1 = new Film();
-        film1.setName("Name1");
-        film1.setDescription("Description1");
-        film1.setReleaseDate(LocalDate.of(1995, 12, 27));
-        film1.setDuration(150L);
+        Film film1 = Film.builder().name("Name1").description("Description1")
+                .releaseDate(LocalDate.of(1995, 12, 27)).duration(150L)
+                .mpa(Mpa.builder().id(3).build()).build();
         filmController.create(film1);
-        Film film2 = new Film();
-        film2.setId(1L);
-        film2.setName("Name2");
-        film2.setDescription("VeeryLongDescriptionVeeryLongDescriptionVeeryLongDescriptionVeeryLongDescription" +
-                "VeeryLongDescriptionVeeryLongDescriptionVeeryLongDescriptionVeeryLongDescriptionVeeryLongDescription" +
-                "VeeryLongDescription1");
-        film2.setReleaseDate(LocalDate.of(1995, 12, 27));
-        film2.setDuration(150L);
+        Film film2 = Film.builder().id(1L).name("Name2")
+                .description("VeeryLongDescriptionVeeryLongDescriptionVeeryLongDescriptionVeeryLongDescription"
+                        + "VeeryLongDescriptionVeeryLongDescriptionVeeryLongDescriptionVeeryLongDescriptionVeery"
+                        + "LongDescriptionVeeryLongDescription1")
+                .releaseDate(LocalDate.of(1995, 12, 27)).duration(150L)
+                .mpa(Mpa.builder().id(3).build()).build();
         ValidationException ex = assertThrows(ValidationException.class, () -> filmController.update(film2));
         assertEquals("Описание фильма должно содержать символы и не может быть больше 200 символов",
                 ex.getMessage());
@@ -180,54 +155,39 @@ class FilmControllerTest {
 
     @Test
     public void updateFilmNewReleaseDateIs27December1895ThrowsValidationException() throws ValidationException {
-        Film film1 = new Film();
-        film1.setName("Name1");
-        film1.setDescription("Description1");
-        film1.setReleaseDate(LocalDate.of(1995, 12, 27));
-        film1.setDuration(150L);
+        Film film1 = Film.builder().name("Name1").description("Description1")
+                .releaseDate(LocalDate.of(1995, 12, 27)).duration(150L)
+                .mpa(Mpa.builder().id(3).build()).build();
         filmController.create(film1);
-        Film film2 = new Film();
-        film2.setId(1L);
-        film2.setName("Name2");
-        film2.setDescription("Description2");
-        film2.setReleaseDate(LocalDate.of(1895, 12, 27));
-        film2.setDuration(150L);
+        Film film2 = Film.builder().id(1L).name("Name2").description("Description2")
+                .releaseDate(LocalDate.of(1895, 12, 27)).duration(150L)
+                .mpa(Mpa.builder().id(3).build()).build();
         ValidationException ex = assertThrows(ValidationException.class, () -> filmController.update(film2));
         assertEquals("Дата выхода фильма не может быть раньше 28 декабря 1895 года", ex.getMessage());
     }
 
     @Test
     public void updateFilmNewDurationIsZeroThrowsValidationException() throws ValidationException {
-        Film film1 = new Film();
-        film1.setName("Name1");
-        film1.setDescription("Description1");
-        film1.setReleaseDate(LocalDate.of(1995, 12, 27));
-        film1.setDuration(150L);
+        Film film1 = Film.builder().name("Name1").description("Description1")
+                .releaseDate(LocalDate.of(1995, 12, 27)).duration(150L)
+                .mpa(Mpa.builder().id(3).build()).build();
         filmController.create(film1);
-        Film film2 = new Film();
-        film2.setId(1L);
-        film2.setName("Name2");
-        film2.setDescription("Description2");
-        film2.setReleaseDate(LocalDate.of(2005, 12, 27));
-        film2.setDuration(0L);
+        Film film2 = Film.builder().id(1L).name("Name2").description("Description2")
+                .releaseDate(LocalDate.of(2005, 12, 27)).duration(0L)
+                .mpa(Mpa.builder().id(3).build()).build();
         ValidationException ex = assertThrows(ValidationException.class, () -> filmController.update(film2));
         assertEquals("Продолжительность фильма не может быть отрицательной или равной нулю", ex.getMessage());
     }
 
     @Test
     public void updateFilmSuccess() throws ValidationException, FilmNotFoundException {
-        Film film1 = new Film();
-        film1.setName("Name1");
-        film1.setDescription("Description1");
-        film1.setReleaseDate(LocalDate.of(1995, 12, 27));
-        film1.setDuration(150L);
+        Film film1 = Film.builder().name("Name1").description("Description1")
+                .releaseDate(LocalDate.of(1995, 12, 27)).duration(150L)
+                .mpa(Mpa.builder().id(3).build()).build();
         filmController.create(film1);
-        Film film2 = new Film();
-        film2.setId(1L);
-        film2.setName("Name2");
-        film2.setDescription("Description2");
-        film2.setReleaseDate(LocalDate.of(2005, 12, 27));
-        film2.setDuration(180L);
+        Film film2 = Film.builder().id(1L).name("Name2").description("Description2")
+                .releaseDate(LocalDate.of(2005, 12, 27)).duration(180L)
+                .mpa(Mpa.builder().id(3).build()).build();
         filmController.update(film2);
         assertEquals(1, filmController.getAll().size());
         assertEquals(film2, filmController.getAll().get(0));
@@ -235,17 +195,13 @@ class FilmControllerTest {
 
     @Test
     public void createAndGetTwoFilms() throws ValidationException {
-        Film film1 = new Film();
-        film1.setName("Name1");
-        film1.setDescription("Description1");
-        film1.setReleaseDate(LocalDate.of(1995, 12, 27));
-        film1.setDuration(150L);
+        Film film1 = Film.builder().name("Name1").description("Description1")
+                .releaseDate(LocalDate.of(1995, 12, 27)).duration(150L)
+                .mpa(Mpa.builder().id(3).build()).build();
         filmController.create(film1);
-        Film film2 = new Film();
-        film2.setName("Name2");
-        film2.setDescription("Description2");
-        film2.setReleaseDate(LocalDate.of(2005, 12, 27));
-        film2.setDuration(180L);
+        Film film2 = Film.builder().name("Name2").description("Description2")
+                .releaseDate(LocalDate.of(2005, 12, 27)).duration(180L)
+                .mpa(Mpa.builder().id(3).build()).build();
         filmController.create(film2);
         assertEquals(2, filmController.getAll().size());
         assertEquals(film1, filmController.getAll().get(0));
@@ -254,22 +210,18 @@ class FilmControllerTest {
 
     @Test
     public void createAndGetFilmById() throws ValidationException, FilmNotFoundException {
-        Film film1 = new Film();
-        film1.setName("Name1");
-        film1.setDescription("Description1");
-        film1.setReleaseDate(LocalDate.of(1995, 12, 27));
-        film1.setDuration(150L);
+        Film film1 = Film.builder().name("Name1").description("Description1")
+                .releaseDate(LocalDate.of(1995, 12, 27)).duration(150L)
+                .mpa(Mpa.builder().id(3).build()).build();
         filmController.create(film1);
         assertEquals(film1, filmController.getById(1L));
     }
 
     @Test
     public void filmLikedByNonExistedUserThrowUserNotFoundException() throws ValidationException {
-        Film film1 = new Film();
-        film1.setName("Name1");
-        film1.setDescription("Description1");
-        film1.setReleaseDate(LocalDate.of(1995, 12, 27));
-        film1.setDuration(150L);
+        Film film1 = Film.builder().name("Name1").description("Description1")
+                .releaseDate(LocalDate.of(1995, 12, 27)).duration(150L)
+                .mpa(Mpa.builder().id(3).build()).build();
         filmController.create(film1);
         UserNotFoundException ex = assertThrows(UserNotFoundException.class, ()
                 -> filmController.likeFilm(1L, 3L));
@@ -278,11 +230,8 @@ class FilmControllerTest {
 
     @Test
     public void userLikesNonExistedFilmThrowFilmNotFoundException() throws ValidationException {
-        User user1 = new User();
-        user1.setEmail("qwerty@gmail.com");
-        user1.setName("UserName");
-        user1.setBirthday(LocalDate.of(1990, 6, 9));
-        user1.setLogin("UserLogin");
+        User user1 = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
         userController.create(user1);
         FilmNotFoundException ex = assertThrows(FilmNotFoundException.class, ()
                 -> filmController.likeFilm(1L, 1L));
@@ -291,17 +240,12 @@ class FilmControllerTest {
 
     @Test
     public void userLikesFilmSuccess() throws ValidationException, UserNotFoundException, FilmNotFoundException {
-        User user1 = new User();
-        user1.setEmail("qwerty@gmail.com");
-        user1.setName("UserName");
-        user1.setBirthday(LocalDate.of(1990, 6, 9));
-        user1.setLogin("UserLogin");
+        User user1 = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
         userController.create(user1);
-        Film film1 = new Film();
-        film1.setName("Name1");
-        film1.setDescription("Description1");
-        film1.setReleaseDate(LocalDate.of(1995, 12, 27));
-        film1.setDuration(150L);
+        Film film1 = Film.builder().name("Name1").description("Description1")
+                .releaseDate(LocalDate.of(1995, 12, 27)).duration(150L)
+                .mpa(Mpa.builder().id(3).build()).build();
         filmController.create(film1);
         filmController.likeFilm(1L, 1L);
         Set<Long> setForTest = new HashSet<>();
@@ -311,11 +255,9 @@ class FilmControllerTest {
 
     @Test
     public void deleteLikeForFilmByNonExistedUserThrowUserNotFoundException() throws ValidationException {
-        Film film1 = new Film();
-        film1.setName("Name1");
-        film1.setDescription("Description1");
-        film1.setReleaseDate(LocalDate.of(1995, 12, 27));
-        film1.setDuration(150L);
+        Film film1 = Film.builder().name("Name1").description("Description1")
+                .releaseDate(LocalDate.of(1995, 12, 27)).duration(150L)
+                .mpa(Mpa.builder().id(3).build()).build();
         filmController.create(film1);
         UserNotFoundException ex = assertThrows(UserNotFoundException.class, ()
                 -> filmController.deleteLike(1L, 2L));
@@ -324,11 +266,8 @@ class FilmControllerTest {
 
     @Test
     public void deleteLikeForNonExistedFilmThrowFilmNotFoundException() throws ValidationException {
-        User user1 = new User();
-        user1.setEmail("qwerty@gmail.com");
-        user1.setName("UserName");
-        user1.setBirthday(LocalDate.of(1990, 6, 9));
-        user1.setLogin("UserLogin");
+        User user1 = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
         userController.create(user1);
         FilmNotFoundException ex = assertThrows(FilmNotFoundException.class, ()
                 -> filmController.deleteLike(1L, 1L));
@@ -337,17 +276,12 @@ class FilmControllerTest {
 
     @Test
     public void deleteLikeForFilmSuccess() throws ValidationException, UserNotFoundException, FilmNotFoundException {
-        User user1 = new User();
-        user1.setEmail("qwerty@gmail.com");
-        user1.setName("UserName");
-        user1.setBirthday(LocalDate.of(1990, 6, 9));
-        user1.setLogin("UserLogin");
+        User user1 = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
         userController.create(user1);
-        Film film1 = new Film();
-        film1.setName("Name1");
-        film1.setDescription("Description1");
-        film1.setReleaseDate(LocalDate.of(1995, 12, 27));
-        film1.setDuration(150L);
+        Film film1 = Film.builder().name("Name1").description("Description1")
+                .releaseDate(LocalDate.of(1995, 12, 27)).duration(150L)
+                .mpa(Mpa.builder().id(3).build()).build();
         filmController.create(film1);
         filmController.likeFilm(1L, 1L);
         filmController.deleteLike(1L, 1L);
@@ -356,17 +290,13 @@ class FilmControllerTest {
 
     @Test
     public void getCountAllFilmsWithoutRates() throws ValidationException {
-        Film film1 = new Film();
-        film1.setName("Name2");
-        film1.setDescription("Description1");
-        film1.setReleaseDate(LocalDate.of(1995, 12, 27));
-        film1.setDuration(150L);
+        Film film1 = Film.builder().name("Name2").description("Description1")
+                .releaseDate(LocalDate.of(1995, 12, 27)).duration(150L)
+                .mpa(Mpa.builder().id(3).build()).build();
         filmController.create(film1);
-        Film film2 = new Film();
-        film2.setName("Name1");
-        film2.setDescription("Description2");
-        film2.setReleaseDate(LocalDate.of(2000, 1, 2));
-        film2.setDuration(140L);
+        Film film2 = Film.builder().name("Name1").description("Description2")
+                .releaseDate(LocalDate.of(2000, 1, 2)).duration(140L)
+                .mpa(Mpa.builder().id(3).build()).build();
         filmController.create(film2);
         List<Film> filmsToTest = new ArrayList<>();
         filmsToTest.add(film2);
@@ -376,17 +306,13 @@ class FilmControllerTest {
 
     @Test
     public void getCountOneFilmAllFilmsWithoutRates() throws ValidationException {
-        Film film1 = new Film();
-        film1.setName("Name2");
-        film1.setDescription("Description1");
-        film1.setReleaseDate(LocalDate.of(1995, 12, 27));
-        film1.setDuration(150L);
+        Film film1 = Film.builder().name("Name2").description("Description1")
+                .releaseDate(LocalDate.of(1995, 12, 27)).duration(150L)
+                .mpa(Mpa.builder().id(3).build()).build();
         filmController.create(film1);
-        Film film2 = new Film();
-        film2.setName("Name1");
-        film2.setDescription("Description2");
-        film2.setReleaseDate(LocalDate.of(2000, 1, 2));
-        film2.setDuration(140L);
+        Film film2 = Film.builder().name("Name1").description("Description2")
+                .releaseDate(LocalDate.of(2000, 1, 2)).duration(140L)
+                .mpa(Mpa.builder().id(3).build()).build();
         filmController.create(film2);
         List<Film> filmsToTest = new ArrayList<>();
         filmsToTest.add(film2);
@@ -396,35 +322,22 @@ class FilmControllerTest {
     @Test
     public void getCountFilmsWithRatingsDifferentRatings()
             throws ValidationException, UserNotFoundException, FilmNotFoundException {
-        Film film1 = new Film();
-        film1.setName("Name2");
-        film1.setDescription("Description1");
-        film1.setReleaseDate(LocalDate.of(1995, 12, 27));
-        film1.setDuration(150L);
+        Film film1 = Film.builder().name("Name2").description("Description1")
+                .releaseDate(LocalDate.of(1995, 12, 27)).duration(150L)
+                .mpa(Mpa.builder().id(3).build()).build();
         filmController.create(film1);
-        Film film2 = new Film();
-        film2.setName("Name1");
-        film2.setDescription("Description2");
-        film2.setReleaseDate(LocalDate.of(2000, 1, 2));
-        film2.setDuration(140L);
+        Film film2 = Film.builder().name("Name1").description("Description2")
+                .releaseDate(LocalDate.of(2000, 1, 2)).duration(140L)
+                .mpa(Mpa.builder().id(3).build()).build();
         filmController.create(film2);
-        User user1 = new User();
-        user1.setEmail("qwerty@gmail.com");
-        user1.setName("UserName");
-        user1.setBirthday(LocalDate.of(1990, 6, 9));
-        user1.setLogin("UserLogin");
+        User user1 = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
         userController.create(user1);
-        User user2 = new User();
-        user2.setEmail("vbscvb@gmail.com");
-        user2.setName("UserName2");
-        user2.setBirthday(LocalDate.of(1985, 2, 9));
-        user2.setLogin("UserLogin2");
+        User user2 = User.builder().email("vbscvb@gmail.com").name("UserName2")
+                .birthday(LocalDate.of(1985, 2, 9)).login("UserLogin2").build();
         userController.create(user2);
-        User user3 = new User();
-        user3.setEmail("lkfldsf@gmail.com");
-        user3.setName("UserName3");
-        user3.setBirthday(LocalDate.of(1991, 2, 26));
-        user3.setLogin("UserLogin3");
+        User user3 = User.builder().email("lkfldsf@gmail.com").name("UserName3")
+                .birthday(LocalDate.of(1991, 2, 26)).login("UserLogin3").build();
         userController.create(user3);
         filmController.likeFilm(2L, 1L);
         filmController.likeFilm(2L, 2L);
@@ -438,35 +351,22 @@ class FilmControllerTest {
     @Test
     public void getCountFilmsWithRatingsSameRatingsSortByName()
             throws ValidationException, UserNotFoundException, FilmNotFoundException {
-        Film film1 = new Film();
-        film1.setName("Name2");
-        film1.setDescription("Description1");
-        film1.setReleaseDate(LocalDate.of(1995, 12, 27));
-        film1.setDuration(150L);
+        Film film1 = Film.builder().name("Name2").description("Description1")
+                .releaseDate(LocalDate.of(1995, 12, 27)).duration(150L)
+                .mpa(Mpa.builder().id(3).build()).build();
         filmController.create(film1);
-        Film film2 = new Film();
-        film2.setName("Name1");
-        film2.setDescription("Description2");
-        film2.setReleaseDate(LocalDate.of(2000, 1, 2));
-        film2.setDuration(140L);
+        Film film2 = Film.builder().name("Name1").description("Description2")
+                .releaseDate(LocalDate.of(2000, 1, 2)).duration(140L)
+                .mpa(Mpa.builder().id(3).build()).build();
         filmController.create(film2);
-        User user1 = new User();
-        user1.setEmail("qwerty@gmail.com");
-        user1.setName("UserName");
-        user1.setBirthday(LocalDate.of(1990, 6, 9));
-        user1.setLogin("UserLogin");
+        User user1 = User.builder().email("qwerty@gmail.com").name("UserName")
+                .birthday(LocalDate.of(1990, 6, 9)).login("UserLogin").build();
         userController.create(user1);
-        User user2 = new User();
-        user2.setEmail("vbscvb@gmail.com");
-        user2.setName("UserName2");
-        user2.setBirthday(LocalDate.of(1985, 2, 9));
-        user2.setLogin("UserLogin2");
+        User user2 = User.builder().email("vbscvb@gmail.com").name("UserName2")
+                .birthday(LocalDate.of(1985, 2, 9)).login("UserLogin2").build();
         userController.create(user2);
-        User user3 = new User();
-        user3.setEmail("lkfldsf@gmail.com");
-        user3.setName("UserName3");
-        user3.setBirthday(LocalDate.of(1991, 2, 26));
-        user3.setLogin("UserLogin3");
+        User user3 = User.builder().email("lkfldsf@gmail.com").name("UserName3")
+                .birthday(LocalDate.of(1991, 2, 26)).login("UserLogin3").build();
         userController.create(user3);
         filmController.likeFilm(2L, 1L);
         filmController.likeFilm(2L, 2L);
