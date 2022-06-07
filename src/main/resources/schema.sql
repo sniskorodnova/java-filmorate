@@ -54,3 +54,6 @@ create unique index if not exists user_film_likes_uindex
 
 create unique index if not exists film_genre_uindex
     on "film_genre" (film_id, genre_id);
+
+create index if not exists film_index
+    on "film" (name);
