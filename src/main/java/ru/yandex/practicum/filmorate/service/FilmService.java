@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.storage.userfilmlikes.UserFilmLikesStorage;
@@ -80,6 +81,30 @@ public class FilmService {
     public List<Film> getCountFilms(int count) {
         List<Film> films = userFilmLikesStorage.getCount(count);
         return films;
+    }
+
+    /**
+     * Метод для получения общих с другом фильмов с сортировкой по их популярности
+     */
+    public List<Film> getCommonFilms(long userId, long friendId)
+            throws UserNotFoundException, ValidationException {
+
+        User user = userStorage.getById(userId);
+        if (user == null) {
+            throw new UserNotFoundException("User with id = " + userId + " not found");
+        }
+
+        User friend = userStorage.getById(friendId);
+        if (friend == null) {
+            throw new UserNotFoundException("User with id = " + friendId + " not found");
+        }
+
+        if ((!user.getFriends().contains(friendId)) || (!friend.getFriends().contains(userId))) {
+            throw new ValidationException("Users must be friends");
+        }
+
+        return userFilmLikesStorage.getCommonFilms(userId, friendId);
+
     }
 
     /**

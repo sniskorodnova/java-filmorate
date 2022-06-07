@@ -13,4 +13,10 @@ public interface UserFilmLikesStorage {
     void removeLike(Long filmId, Long userId);
 
     List<Film> getCount(int count);
+
+    /**
+     * Вывод общих с другом фильмов с сортировкой по их популярности
+     */
+    List<Film> getCommonFilms(long userId, long friendId);
+
 }

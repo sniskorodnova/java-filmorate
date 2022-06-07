@@ -55,6 +55,20 @@ public class UserFilmLikesDbStorage implements UserFilmLikesStorage {
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
     }
 
+    @Override
+    public List<Film> getCommonFilms(long userId, long friendId) {
+
+        String sqlQuery =
+            "SELECT f.* FROM film f "
+          + "INNER JOIN user_film_likes ufl1 ON ufl1.film_id = f.film_id "
+          + "INNER JOIN user_film_likes ufl2 ON ufl2.film_id = f.film_id "
+          + "WHERE ufl1.USER_ID = ? AND ufl2.USER_ID = ? "
+          + "ORDER BY (SELECT COUNT(*) FROM user_film_likes ul WHERE ul.film_id = f.film_id) DESC";
+
+        return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, userId, friendId);
+
+    }
+
     /**
      * Метод для маппинга полей фильма из таблицы в объект
      */
