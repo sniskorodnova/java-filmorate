@@ -55,6 +55,9 @@ public class UserFilmLikesDbStorage implements UserFilmLikesStorage {
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
     }
 
+    /**
+     * Вывод общих с другом фильмов с сортировкой по их популярности
+     */
     @Override
     public List<Film> getCommonFilms(long userId, long friendId) {
 
