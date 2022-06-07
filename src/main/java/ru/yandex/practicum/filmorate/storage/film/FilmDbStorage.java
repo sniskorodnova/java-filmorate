@@ -35,7 +35,7 @@ public class FilmDbStorage implements FilmStorage {
      */
     @Override
     public List<Film> getAll() {
-        String sqlQuery = "SELECT FILM_ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION, RATING_MPAA_ID FROM \"film\"";
+        String sqlQuery = "SELECT FILM_ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION, RATING_MPAA_ID FROM film";
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
     }
 
@@ -44,7 +44,7 @@ public class FilmDbStorage implements FilmStorage {
      */
     @Override
     public Film create(Film film) {
-        String sqlQuery = "INSERT INTO \"film\" (NAME, DESCRIPTION, RELEASE_DATE, DURATION, RATING_MPAA_ID) " +
+        String sqlQuery = "INSERT INTO film (NAME, DESCRIPTION, RELEASE_DATE, DURATION, RATING_MPAA_ID) " +
                 "values (?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -66,7 +66,7 @@ public class FilmDbStorage implements FilmStorage {
      */
     @Override
     public Film update(Film film) {
-        String sqlQuery = "UPDATE \"film\" SET "
+        String sqlQuery = "UPDATE film SET "
                 + "NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?, DURATION = ?, RATING_MPAA_ID = ? "
                 + "WHERE FILM_ID = ?";
 
@@ -86,7 +86,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film getById (Long id) {
         String sqlQuery = "SELECT FILM_ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION, RATING_MPAA_ID " +
-                "FROM \"film\" WHERE FILM_ID = ?";
+                "FROM film WHERE FILM_ID = ?";
         SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
         if (row.next()) {
             return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, id);
@@ -100,7 +100,7 @@ public class FilmDbStorage implements FilmStorage {
      */
     @Override
     public void deleteAll() {
-        String sqlQuery = "DELETE FROM \"film\"";
+        String sqlQuery = "DELETE FROM film";
         jdbcTemplate.update(sqlQuery);
     }
 
@@ -109,11 +109,11 @@ public class FilmDbStorage implements FilmStorage {
      */
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         int mpaId = resultSet.getInt("RATING_MPAA_ID");
-        String sqlFindName = "SELECT RATING_MPAA_ID, NAME FROM \"rating_mpaa\" WHERE RATING_MPAA_ID = ?";
+        String sqlFindName = "SELECT RATING_MPAA_ID, NAME FROM rating_mpaa WHERE RATING_MPAA_ID = ?";
         Mpa mpa = jdbcTemplate.queryForObject(sqlFindName, this::mapRowToMpa, mpaId);
 
         Set<Long> idLikes = new HashSet<>();
-        String sqlFindLikes = "SELECT USER_ID FROM \"user_film_likes\" WHERE FILM_ID = ?";
+        String sqlFindLikes = "SELECT USER_ID FROM user_film_likes WHERE FILM_ID = ?";
         SqlRowSet row = jdbcTemplate.queryForRowSet(sqlFindLikes, resultSet.getLong("FILM_ID"));
         while(row.next()) {
             idLikes.add(row.getLong("USER_ID"));

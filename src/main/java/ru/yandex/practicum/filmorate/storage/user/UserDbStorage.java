@@ -40,7 +40,7 @@ public class UserDbStorage implements UserStorage {
      */
     @Override
     public User create(User user) {
-        String sqlQuery = "INSERT INTO \"user\" (EMAIL, LOGIN, NAME, BIRTHDAY) VALUES (?, ?, ?, ?)";
+        String sqlQuery = "INSERT INTO users (EMAIL, LOGIN, NAME, BIRTHDAY) VALUES (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
@@ -60,7 +60,7 @@ public class UserDbStorage implements UserStorage {
      */
     @Override
     public User update(User user) {
-        String sqlQuery = "UPDATE \"user\" SET EMAIL = ?, LOGIN = ?, NAME = ?, BIRTHDAY = ? WHERE USER_ID = ?";
+        String sqlQuery = "UPDATE users SET EMAIL = ?, LOGIN = ?, NAME = ?, BIRTHDAY = ? WHERE USER_ID = ?";
         jdbcTemplate.update(sqlQuery,
                 user.getEmail(),
                 user.getLogin(),
@@ -76,7 +76,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User getById(Long id) {
         String sqlQuery = "SELECT USER_ID, EMAIL, LOGIN, NAME, BIRTHDAY " +
-                "FROM \"user\" WHERE USER_ID = ?";
+                "FROM users WHERE USER_ID = ?";
         SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
         if (row.next()) {
             return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, id);
@@ -90,7 +90,7 @@ public class UserDbStorage implements UserStorage {
      */
     @Override
     public List<User> getAll() {
-        String sqlQuery = "SELECT USER_ID, EMAIL, LOGIN, NAME, BIRTHDAY FROM \"user\"";
+        String sqlQuery = "SELECT USER_ID, EMAIL, LOGIN, NAME, BIRTHDAY FROM users";
         return jdbcTemplate.query(sqlQuery, this::mapRowToUser);
     }
 
@@ -99,7 +99,7 @@ public class UserDbStorage implements UserStorage {
      */
     @Override
     public void deleteAll() {
-        String sqlQuery = "DELETE FROM \"user\"";
+        String sqlQuery = "DELETE FROM users";
         jdbcTemplate.update(sqlQuery);
     }
 
