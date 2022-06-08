@@ -72,7 +72,7 @@ create table if not exists review
 
 create table if not exists review_likes
 (
-    review_id long references review (review_id),
+    review_id long references review (review_id) ON DELETE CASCADE,
     user_id long references users (user_id),
     is_like boolean
 );

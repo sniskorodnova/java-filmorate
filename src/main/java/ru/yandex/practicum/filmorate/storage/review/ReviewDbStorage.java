@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.model.Review;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 @Component
 public class ReviewDbStorage implements ReviewStorage {
@@ -23,12 +24,12 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public Review create(Review review) {
-        String sqlQuery = "INSERT INTO \"review\" (CONTENT, IS_POSITIVE, USER_ID, FILM_ID) " +
+        String sqlQuery = "INSERT INTO review (CONTENT, IS_POSITIVE, USER_ID, FILM_ID) " +
                 "values (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
-            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"FILM_ID"});
+            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"REVIEW_ID"});
             stmt.setString(1, review.getContent());
             stmt.setBoolean(2, review.isPositive());
             stmt.setLong(3, review.getUserId());
@@ -40,15 +41,44 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     @Override
-    public Review getById (Long id) {
-        String sqlQuery = "SELECT REVIEW_ID, CONTENT, IS_POSITIVE, USER_ID, FILM_ID " +
-                "FROM \"review\" WHERE REVIEW_ID = ?";
+    public Review getById(Long id) {
+        String sqlQuery = "SELECT REVIEW_ID, CONTENT, IS_POSITIVE, USER_ID, FILM_ID, "
+                + "(SELECT SUM(DECODE(IS_LIKE, true, 1, -1)) FROM review_likes rl "
+                + "WHERE rl.REVIEW_ID = r.REVIEW_ID) USEFUL FROM review r WHERE r.REVIEW_ID = ?";
         SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
         if (row.next()) {
             return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToReview, id);
         } else {
             return null;
         }
+    }
+
+    @Override
+    public Review update(Review review) {
+        String sqlQuery = "UPDATE review SET "
+                + "CONTENT = ?, IS_POSITIVE = ? "
+                + "WHERE REVIEW_ID = ?";
+
+        jdbcTemplate.update(sqlQuery,
+                review.getContent(),
+                review.isPositive(),
+                review.getId());
+        return getById(review.getId());
+    }
+
+    @Override
+    public List<Review> getReviewsForFilm(Long id, int count) {
+        String sqlQuery = "SELECT REVIEW_ID, CONTENT, IS_POSITIVE, USER_ID, FILM_ID, "
+                + "(SELECT SUM(DECODE(IS_LIKE, true, 1, -1)) FROM review_likes rl "
+                + "WHERE rl.REVIEW_ID = r.REVIEW_ID) useful FROM review r WHERE r.FILM_ID = ? LIMIT ?";
+
+        return jdbcTemplate.query(sqlQuery, this::mapRowToReview, id, count);
+    }
+
+    @Override
+    public void deleteById(Long reviewId) {
+        String sqlQuery = "DELETE FROM review WHERE REVIEW_ID = ?";
+        jdbcTemplate.update(sqlQuery, reviewId);
     }
 
     private Review mapRowToReview(ResultSet resultSet, int rowNum) throws SQLException {
@@ -58,6 +88,7 @@ public class ReviewDbStorage implements ReviewStorage {
                 .isPositive(resultSet.getBoolean("IS_POSITIVE"))
                 .userId(resultSet.getLong("USER_ID"))
                 .filmId(resultSet.getLong("FILM_ID"))
+                .useful(resultSet.getLong("USEFUL"))
                 .build();
     }
 }
