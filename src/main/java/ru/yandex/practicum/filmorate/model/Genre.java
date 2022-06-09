@@ -4,11 +4,11 @@ import lombok.Builder;
 import lombok.Data;
 
 /**
- * Класс, описывающий рейтинг фильмов mpa
+ * Класс, описывающий сущность жанр
  */
 @Data
 @Builder
-public class Mpa {
+public class Genre {
     private int id;
     private String name;
 }
