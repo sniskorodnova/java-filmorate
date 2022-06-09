@@ -104,6 +104,9 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update(sqlQuery);
     }
 
+    /**
+     * Метод удаления фильма
+     */
     @Override
     public void delete(Long id) {
         String sqlQuery = "UPDATE film SET is_delete = TRUE WHERE film_id = ?";
