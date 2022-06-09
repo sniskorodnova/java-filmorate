@@ -39,7 +39,7 @@ public class FilmController {
      * Метод для создания фильма
      */
     @PostMapping
-    public Film create(@RequestBody Film film) throws ValidationException {
+    public Film create(@RequestBody Film film) throws ValidationException, FilmNotFoundException {
         log.debug("Входящий запрос на создание фильма");
         log.debug(film.toString());
         return filmService.create(film);

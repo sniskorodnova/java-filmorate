@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -20,6 +21,7 @@ public class Film {
     private Long duration;
     private Mpa mpa;
     private Set<Long> likesFromUsers;
+    private LinkedHashSet<Genre> genres;
     private static AtomicLong counter = new AtomicLong(0);
 
     public static void setCounter(AtomicLong counter) {
