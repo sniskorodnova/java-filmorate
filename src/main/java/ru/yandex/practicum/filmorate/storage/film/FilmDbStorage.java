@@ -86,7 +86,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film getById (Long id) {
         String sqlQuery = "SELECT FILM_ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION, RATING_MPAA_ID " +
-                "FROM film WHERE FILM_ID = ?";
+                "FROM film WHERE (NOT is_delete) AND (FILM_ID = ?)";
         SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
         if (row.next()) {
             return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, id);
@@ -102,6 +102,12 @@ public class FilmDbStorage implements FilmStorage {
     public void deleteAll() {
         String sqlQuery = "DELETE FROM film";
         jdbcTemplate.update(sqlQuery);
+    }
+
+    @Override
+    public void delete(Long id) {
+        String sqlQuery = "UPDATE film SET is_delete = TRUE WHERE film_id = ?";
+        jdbcTemplate.update(sqlQuery, id);
     }
 
     /**

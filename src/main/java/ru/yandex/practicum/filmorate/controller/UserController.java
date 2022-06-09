@@ -55,6 +55,16 @@ public class UserController {
     }
 
     /**
+     * Метод удаления пользователя
+     */
+    @DeleteMapping("/{userId}")
+    public void delete (@PathVariable Long userId)
+            throws UserNotFoundException {
+        log.debug("Входящий запрос на удаление пользователя с id = {}", userId);
+        userService.delete(userId);
+    }
+
+    /**
      * Метод для получения списка друзей пользователя
      */
     @GetMapping("/{userId}/friends")

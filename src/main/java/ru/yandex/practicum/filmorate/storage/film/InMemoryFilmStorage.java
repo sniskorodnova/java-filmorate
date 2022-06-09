@@ -59,4 +59,9 @@ public class InMemoryFilmStorage implements FilmStorage {
     public void deleteAll() {
         films.clear();
     }
+
+    @Override
+    public void delete(Long id) {
+        // заглушка
+    }
 }
