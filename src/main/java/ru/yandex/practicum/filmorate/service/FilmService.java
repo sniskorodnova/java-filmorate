@@ -86,7 +86,7 @@ public class FilmService {
     }
 
     /**
-     * Метод удаления фирмы
+     * Метод удаления фильма
      */
     public void delete(Long id) throws FilmNotFoundException {
         if (filmStorage.getById(id) != null) {
