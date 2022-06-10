@@ -90,7 +90,8 @@ public class UserDbStorage implements UserStorage {
      */
     @Override
     public List<User> getAll() {
-        String sqlQuery = "SELECT USER_ID, EMAIL, LOGIN, NAME, BIRTHDAY FROM users";
+        String sqlQuery = "SELECT USER_ID, EMAIL, LOGIN, NAME, BIRTHDAY FROM users " +
+                "WHERE NOT is_delete";
         return jdbcTemplate.query(sqlQuery, this::mapRowToUser);
     }
 

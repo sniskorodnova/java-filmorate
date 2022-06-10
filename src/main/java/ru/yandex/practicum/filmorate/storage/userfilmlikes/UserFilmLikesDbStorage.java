@@ -50,6 +50,7 @@ public class UserFilmLikesDbStorage implements UserFilmLikesStorage {
         String sqlQuery = "SELECT f.FILM_ID, f.NAME, f.DESCRIPTION, f.RELEASE_DATE, f.DURATION, "
                 + "f.RATING_MPAA_ID, COUNT(u.USER_ID) AS likes_count FROM film f "
                 + "LEFT OUTER JOIN user_film_likes u ON f.FILM_ID = u.FILM_ID "
+                + "WHERE NOT f.is_delete "
                 + "GROUP BY f.FILM_ID ORDER BY likes_count DESC LIMIT ?";
 
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);

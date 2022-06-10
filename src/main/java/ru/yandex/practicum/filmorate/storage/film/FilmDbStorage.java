@@ -35,7 +35,8 @@ public class FilmDbStorage implements FilmStorage {
      */
     @Override
     public List<Film> getAll() {
-        String sqlQuery = "SELECT FILM_ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION, RATING_MPAA_ID FROM film";
+        String sqlQuery = "SELECT FILM_ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION, " +
+                "RATING_MPAA_ID FROM film WHERE NOT is_delete";
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
     }
 
