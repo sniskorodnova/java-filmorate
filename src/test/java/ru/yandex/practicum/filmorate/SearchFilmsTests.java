@@ -17,6 +17,8 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -45,7 +47,22 @@ public class SearchFilmsTests {
         filmDbStorage.create(film3);
 
         List<Film> films = searchService.searchFilmByParam("крад", List.of("title"));
-
         assertThat(films.size(), is(2));
+
+        films = searchService.searchFilmByParam("Крад", List.of("title"));
+        assertThat(films.size(), is(2));
+
+        films = searchService.searchFilmByParam("Конокрад", List.of("title"));
+        assertThat(films.size(), is(0));
+    }
+
+    @Test
+    public void checkThrowExceptionUnsupportedOperation() {
+        final UnsupportedOperationException exception = assertThrows(
+                UnsupportedOperationException.class,
+                () -> searchService.searchFilmByParam("крад", List.of("director"))
+                );
+
+        assertEquals("Поиск по DIRECTOR на текущий момент не поддерживается", exception.getMessage());
     }
 }
