@@ -95,6 +95,16 @@ public class FilmController {
     }
 
     /**
+     * Метод удаления фильма по id
+     */
+    @DeleteMapping("/{filmId}")
+    public void delete(@PathVariable Long filmId)
+            throws FilmNotFoundException {
+        log.debug("Входящий запрос на удаление фильма с id = {}", filmId);
+        filmService.delete(filmId);
+    }
+
+    /**
      * Обработка ошибки, если фильм не найден
      */
     @ExceptionHandler

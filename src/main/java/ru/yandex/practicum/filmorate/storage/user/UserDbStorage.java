@@ -76,7 +76,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User getById(Long id) {
         String sqlQuery = "SELECT USER_ID, EMAIL, LOGIN, NAME, BIRTHDAY " +
-                "FROM users WHERE USER_ID = ?";
+                "FROM users WHERE (NOT is_delete) AND (USER_ID = ?)";
         SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
         if (row.next()) {
             return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, id);
@@ -90,7 +90,8 @@ public class UserDbStorage implements UserStorage {
      */
     @Override
     public List<User> getAll() {
-        String sqlQuery = "SELECT USER_ID, EMAIL, LOGIN, NAME, BIRTHDAY FROM users";
+        String sqlQuery = "SELECT USER_ID, EMAIL, LOGIN, NAME, BIRTHDAY FROM users " +
+                "WHERE NOT is_delete";
         return jdbcTemplate.query(sqlQuery, this::mapRowToUser);
     }
 
@@ -101,6 +102,12 @@ public class UserDbStorage implements UserStorage {
     public void deleteAll() {
         String sqlQuery = "DELETE FROM users";
         jdbcTemplate.update(sqlQuery);
+    }
+
+    @Override
+    public void delete(Long id) {
+        String sqlQuery = "UPDATE users SET is_delete = TRUE WHERE user_id = ?";
+        jdbcTemplate.update(sqlQuery, id);
     }
 
     /**

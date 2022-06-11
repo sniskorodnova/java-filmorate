@@ -17,7 +17,8 @@ create table if not exists film
     description varchar(255),
     release_date date,
     duration long,
-    rating_mpaa_id integer
+    rating_mpaa_id integer,
+    is_delete boolean default false
 );
 
 create table if not exists film_genre
@@ -32,7 +33,8 @@ create table if not exists users
     email varchar(100) UNIQUE,
     login varchar(100) UNIQUE,
     name varchar(100),
-    birthday date
+    birthday date,
+    is_delete boolean default false
 );
 
 create table if not exists user_film_likes
