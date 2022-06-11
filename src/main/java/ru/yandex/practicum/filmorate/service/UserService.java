@@ -6,12 +6,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.friendship.FriendshipStorage;
+import ru.yandex.practicum.filmorate.storage.recommendations.UserRecommendationStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Класс-сервис, отвечающий за логику работы с пользователями
@@ -21,12 +25,18 @@ import java.util.List;
 public class UserService {
     private final UserStorage userStorage;
     private final FriendshipStorage friendshipStorage;
+    private final UserRecommendationStorage userRecommendationStorage;
+    private final FilmStorage filmStorage;
 
     @Autowired
     public UserService(@Qualifier("userDbStorage") UserStorage userStorage,
-                       @Qualifier("friendshipDbStorage") FriendshipStorage friendshipStorage) {
+                       @Qualifier("friendshipDbStorage") FriendshipStorage friendshipStorage,
+                       UserRecommendationStorage userRecommendationStorage,
+                       @Qualifier("filmDbStorage") FilmStorage filmStorage) {
         this.userStorage = userStorage;
         this.friendshipStorage = friendshipStorage;
+        this.userRecommendationStorage = userRecommendationStorage;
+        this.filmStorage = filmStorage;
     }
 
     public UserStorage getUserStorage() {
@@ -170,5 +180,9 @@ public class UserService {
             log.debug("Произошла ошибка валидации для пользователя:");
             throw new ValidationException("День рождения пользователя не может быть в будущем");
         }
+    }
+
+    public List<Film> getRecommendation(Long id) {
+        return userRecommendationStorage.getRecommendation(id).stream().map(filmStorage::getById).collect(Collectors.toList());
     }
 }

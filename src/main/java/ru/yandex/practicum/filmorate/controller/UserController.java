@@ -6,10 +6,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Класс-контроллер для работы с пользователями
@@ -130,5 +132,18 @@ public class UserController {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleServerError(final RuntimeException e) {
         return new ErrorResponse(e.getMessage());
+    }
+
+    /**
+     * Метод для получения рекомендаций для пользователя
+     * Выводит топ 10 рекомендаций, отсортированные по убыванию количества лайков
+     */
+    @GetMapping("/{id}/recommendations")
+    public List<Film> getRecomendation(@PathVariable Long id) {
+        return userService.getRecommendation(id)
+                .stream()
+                .sorted((o1, o2) -> o2.getLikesFromUsers().size() - o1.getLikesFromUsers().size())
+                .limit(10L)
+                .collect(Collectors.toList());
     }
 }
