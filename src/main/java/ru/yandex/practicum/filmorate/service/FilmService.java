@@ -130,7 +130,7 @@ public class FilmService {
      * Метод для получения общих с другом фильмов с сортировкой по их популярности
      */
     public List<Film> getCommonFilms(long userId, long friendId)
-            throws UserNotFoundException, ValidationException {
+            throws UserNotFoundException {
 
         User user = userStorage.getById(userId);
         if (user == null) {

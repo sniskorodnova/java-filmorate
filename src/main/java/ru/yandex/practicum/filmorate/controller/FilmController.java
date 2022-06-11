@@ -78,7 +78,7 @@ public class FilmController {
     // /common?userId={userId}&friendId={friendId}
     @GetMapping("/common")
     public List<Film> getCommonFilms(@RequestParam long userId, @RequestParam long friendId)
-            throws UserNotFoundException, ValidationException {
+            throws UserNotFoundException {
         log.debug("Входящий запрос на получение общих с другом фильмов с сортировкой " +
                   "по их популярности");
         return filmService.getCommonFilms(userId, friendId);

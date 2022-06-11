@@ -32,7 +32,7 @@ public class CommonFilmsTest {
     private final UserFilmLikesDbStorage likesDbStorage;
 
     @Test
-    public void checkCommonFilms() {
+    public void check_exists_common_films() {
 
         User user1 = User.builder()
                 .name("user1")
@@ -108,6 +108,141 @@ public class CommonFilmsTest {
         assertEquals(2, commonFilms.size());
         assertEquals(film3.getId(), commonFilms.get(0).getId());
         assertEquals(film2.getId(), commonFilms.get(1).getId());
+
+    }
+
+    @Test
+    public void check_not_exists_common_films_1() {
+
+        User user1 = User.builder()
+                .name("user1")
+                .email("aaa@bbb.ru")
+                .login("user1")
+                .birthday(LocalDate.of(1990, 6, 9))
+                .build();
+
+        User user2 = User.builder()
+                .name("user2")
+                .email("bbb@bbb.ru")
+                .login("user2")
+                .birthday(LocalDate.of(1990, 6, 9))
+                .build();
+
+        user1 = userDbStorage.create(user1);
+        user2 = userDbStorage.create(user2);
+
+        Film film1 = Film.builder()
+                .name("Name1")
+                .description("Description")
+                .releaseDate(LocalDate.of(1995, 12, 27)).duration(120L)
+                .mpa(Mpa.builder().id(3).build())
+                .build();
+
+        Film film2 = Film.builder()
+                .name("Name2")
+                .description("Description")
+                .releaseDate(LocalDate.of(1995, 12, 27)).duration(120L)
+                .mpa(Mpa.builder().id(3).build())
+                .build();
+
+        film1 = filmDbStorage.create(film1);
+        film2 = filmDbStorage.create(film2);
+
+        likesDbStorage.saveLike(film1.getId(), user1.getId());
+        likesDbStorage.saveLike(film2.getId(), user2.getId());
+
+        List<Film> commonFilms = likesDbStorage.getCommonFilms(user1.getId(), user2.getId());
+
+        assertEquals(0, commonFilms.size());
+
+    }
+
+    @Test
+    public void check_not_exists_common_films_2() {
+
+        User user1 = User.builder()
+                .name("user1")
+                .email("aaa@bbb.ru")
+                .login("user1")
+                .birthday(LocalDate.of(1990, 6, 9))
+                .build();
+
+        User user2 = User.builder()
+                .name("user2")
+                .email("bbb@bbb.ru")
+                .login("user2")
+                .birthday(LocalDate.of(1990, 6, 9))
+                .build();
+
+        user1 = userDbStorage.create(user1);
+        user2 = userDbStorage.create(user2);
+
+        Film film1 = Film.builder()
+                .name("Name1")
+                .description("Description")
+                .releaseDate(LocalDate.of(1995, 12, 27)).duration(120L)
+                .mpa(Mpa.builder().id(3).build())
+                .build();
+
+        Film film2 = Film.builder()
+                .name("Name2")
+                .description("Description")
+                .releaseDate(LocalDate.of(1995, 12, 27)).duration(120L)
+                .mpa(Mpa.builder().id(3).build())
+                .build();
+
+        film1 = filmDbStorage.create(film1);
+        film2 = filmDbStorage.create(film2);
+
+        likesDbStorage.saveLike(film1.getId(), user1.getId());
+        likesDbStorage.saveLike(film2.getId(), user1.getId());
+
+        List<Film> commonFilms = likesDbStorage.getCommonFilms(user1.getId(), user2.getId());
+
+        assertEquals(0, commonFilms.size());
+
+    }
+
+    @Test
+    public void check_not_exists_common_films_3() {
+
+        User user1 = User.builder()
+                .name("user1")
+                .email("aaa@bbb.ru")
+                .login("user1")
+                .birthday(LocalDate.of(1990, 6, 9))
+                .build();
+
+        User user2 = User.builder()
+                .name("user2")
+                .email("bbb@bbb.ru")
+                .login("user2")
+                .birthday(LocalDate.of(1990, 6, 9))
+                .build();
+
+        user1 = userDbStorage.create(user1);
+        user2 = userDbStorage.create(user2);
+
+        Film film1 = Film.builder()
+                .name("Name1")
+                .description("Description")
+                .releaseDate(LocalDate.of(1995, 12, 27)).duration(120L)
+                .mpa(Mpa.builder().id(3).build())
+                .build();
+
+        Film film2 = Film.builder()
+                .name("Name2")
+                .description("Description")
+                .releaseDate(LocalDate.of(1995, 12, 27)).duration(120L)
+                .mpa(Mpa.builder().id(3).build())
+                .build();
+
+        film1 = filmDbStorage.create(film1);
+        film2 = filmDbStorage.create(film2);
+
+        List<Film> commonFilms = likesDbStorage.getCommonFilms(user1.getId(), user2.getId());
+
+        assertEquals(0, commonFilms.size());
 
     }
 
