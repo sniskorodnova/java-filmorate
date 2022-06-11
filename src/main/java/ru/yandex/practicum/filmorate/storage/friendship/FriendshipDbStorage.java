@@ -75,7 +75,7 @@ public class FriendshipDbStorage implements FriendshipStorage {
                 + "UNION ALL "
                 + "SELECT FRIEND_ID AS user_id FROM friendship "
                 + "WHERE USER_ID = ?) AS users_id INNER JOIN users u "
-                + "ON u.USER_ID = users_id.user_id";
+                + "ON u.USER_ID = users_id.user_id AND (NOT u.is_delete)";
         return jdbcTemplate.query(sqlQuery, this::mapRowToUser, userId, userId);
     }
 
@@ -97,15 +97,17 @@ public class FriendshipDbStorage implements FriendshipStorage {
      */
     @Override
     public List<User> getCommonFriends(Long userId, Long otherUserId) {
+
         String sqlQuery = "SELECT * FROM ((SELECT USER_ID AS user_id FROM friendship "
-                + "WHERE FRIEND_ID = ? "
+                + "WHERE (FRIEND_ID = ?) "
                 + "UNION ALL "
                 + "SELECT FRIEND_ID AS user_id FROM friendship "
                 + "WHERE USER_ID = ?) INTERSECT (SELECT USER_ID AS user_id "
                 + "FROM friendship WHERE FRIEND_ID = ? UNION ALL "
                 + "SELECT FRIEND_ID AS user_id FROM friendship "
                 + "WHERE USER_ID = ?)) AS common_friends "
-                + "INNER JOIN users u ON u.user_id = common_friends.user_id";
+                + "INNER JOIN users u ON u.user_id = common_friends.user_id AND (NOT u.is_delete)";
+
         return jdbcTemplate.query(sqlQuery, this::mapRowToUser, userId, userId, otherUserId, otherUserId);
     }
 

@@ -68,6 +68,17 @@ public class UserService {
     }
 
     /**
+     * Метод удаления пользователя
+     */
+    public void delete(Long id) throws UserNotFoundException {
+        if (userStorage.getById(id) != null) {
+            userStorage.delete(id);
+        } else {
+            throw new UserNotFoundException("User with id = " + id + " not found");
+        }
+    }
+
+    /**
      * Метод для получения информации о пользователе по его id
      */
     public User getById(Long userId) throws UserNotFoundException {
