@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.genrefilm.FilmGenreStorage;
@@ -123,6 +124,31 @@ public class FilmService {
      */
     public List<Film> getCountFilms(int count) {
         return userFilmLikesStorage.getCount(count);
+    }
+
+    /**
+     * Метод для получения общих с другом фильмов с сортировкой по их популярности
+     */
+    public List<Film> getCommonFilms(long userId, long friendId)
+            throws UserNotFoundException {
+
+        User user = userStorage.getById(userId);
+        if (user == null) {
+            throw new UserNotFoundException("User with id = " + userId + " not found");
+        }
+
+        User friend = userStorage.getById(friendId);
+        if (friend == null) {
+            throw new UserNotFoundException("User with id = " + friendId + " not found");
+        }
+
+        // Владимир Иванов сказал, что требования к друзъям больше нет
+        //if ((!user.getFriends().contains(friendId)) || (!friend.getFriends().contains(userId))) {
+        //    throw new ValidationException("Users must be friends");
+        //}
+
+        return userFilmLikesStorage.getCommonFilms(userId, friendId);
+
     }
 
     /**

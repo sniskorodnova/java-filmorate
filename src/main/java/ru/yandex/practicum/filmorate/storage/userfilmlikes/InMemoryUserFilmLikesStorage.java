@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmComparator;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -58,5 +59,10 @@ public class InMemoryUserFilmLikesStorage implements UserFilmLikesStorage {
         List<Film> films = filmStorage.getAll();
         films.sort(new FilmComparator());
         return films.stream().limit(count).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Film> getCommonFilms(long userId, long friendId) {
+        return new ArrayList<>(); // Заглушка
     }
 }
