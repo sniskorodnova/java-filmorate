@@ -157,6 +157,8 @@ public class FilmService {
     public Film likeFilm(Long filmId, Long userId) throws UserNotFoundException, FilmNotFoundException {
         Film film = filmStorage.getById(filmId);
 
+        //throw new FilmNotFoundException("EEEE 5555");
+
         if (film == null) {
             throw new FilmNotFoundException("Film with id = " + filmId + " not found");
         } else if (userStorage.getById(userId) == null) {
@@ -165,6 +167,8 @@ public class FilmService {
             userFilmLikesStorage.saveLike(filmId, userId);
             return filmStorage.update(film);
         }
+
+
     }
 
     /**
