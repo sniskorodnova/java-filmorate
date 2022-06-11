@@ -117,7 +117,7 @@ public class FilmDbStorage implements FilmStorage {
     /**
      * Метод для маппинга полей фильма из таблицы в объект
      */
-    private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
+    public Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         int mpaId = resultSet.getInt("RATING_MPAA_ID");
         String sqlFindName = "SELECT RATING_MPAA_ID, NAME FROM rating_mpaa WHERE RATING_MPAA_ID = ?";
         Mpa mpa = jdbcTemplate.queryForObject(sqlFindName, this::mapRowToMpa, mpaId);
