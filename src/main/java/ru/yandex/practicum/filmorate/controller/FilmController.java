@@ -39,7 +39,7 @@ public class FilmController {
      * Метод для создания фильма
      */
     @PostMapping
-    public Film create(@RequestBody Film film) throws ValidationException {
+    public Film create(@RequestBody Film film) throws ValidationException, FilmNotFoundException {
         log.debug("Входящий запрос на создание фильма");
         log.debug(film.toString());
         return filmService.create(film);
@@ -92,6 +92,16 @@ public class FilmController {
     public List<Film> getCountFilms(@RequestParam(defaultValue = "10") int count) {
         log.debug("Входящий запрос на получение первых {} популярных фильмов", count);
         return filmService.getCountFilms(count);
+    }
+
+    /**
+     * Метод удаления фильма по id
+     */
+    @DeleteMapping("/{filmId}")
+    public void delete(@PathVariable Long filmId)
+            throws FilmNotFoundException {
+        log.debug("Входящий запрос на удаление фильма с id = {}", filmId);
+        filmService.delete(filmId);
     }
 
     /**

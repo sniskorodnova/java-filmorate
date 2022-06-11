@@ -7,15 +7,18 @@ import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.genrefilm.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.storage.userfilmlikes.UserFilmLikesStorage;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.*;
 
 /**
- * Класс-сервис, отвечающий за логику работы с фильмами. Для реализации логики используются методы хранилищ
+ * Класс-сервис, отвечающий за логику работы с фильмами
  */
 @Service
 @Slf4j
@@ -23,13 +26,18 @@ public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
     private final UserFilmLikesStorage userFilmLikesStorage;
+    private final FilmGenreStorage filmGenreStorage;
+    private final GenreStorage genreStorage;
 
     public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
                        @Qualifier("userDbStorage") UserStorage userStorage,
-                       @Qualifier("userFilmLikesDbStorage") UserFilmLikesStorage userFilmLikesStorage) {
+                       @Qualifier("userFilmLikesDbStorage") UserFilmLikesStorage userFilmLikesStorage,
+                       FilmGenreStorage filmGenreStorage, GenreStorage genreStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.userFilmLikesStorage = userFilmLikesStorage;
+        this.filmGenreStorage = filmGenreStorage;
+        this.genreStorage = genreStorage;
     }
 
     public FilmStorage getFilmStorage() {
@@ -46,9 +54,16 @@ public class FilmService {
     /**
      * Метод создания нового фильма. Перед добавлением фильм валидируется
      */
-    public Film create(Film film) throws ValidationException {
+    public Film create(Film film) throws ValidationException, FilmNotFoundException {
         validate(film);
-        return filmStorage.create(film);
+        Film filmWithId = filmStorage.create(film);
+        film.setId(filmWithId.getId());
+        if (film.getGenres() != null) {
+            for (Genre genre : film.getGenres()) {
+                filmGenreStorage.create(film.getId(), genre.getId());
+            }
+        }
+        return film;
     }
 
     /**
@@ -57,9 +72,27 @@ public class FilmService {
     public Film update(Film film) throws ValidationException, FilmNotFoundException {
         if (filmStorage.getById(film.getId()) != null) {
             validate(film);
-            return filmStorage.update(film);
+            filmGenreStorage.deleteByFilmId(film.getId());
+            filmStorage.update(film);
+            if (film.getGenres() != null) {
+                for (Genre genre : film.getGenres()) {
+                    filmGenreStorage.create(film.getId(), genre.getId());
+                }
+            }
+            return film;
         } else {
             throw new FilmNotFoundException("Film with id = " + film.getId() + " not found");
+        }
+    }
+
+    /**
+     * Метод удаления фильма
+     */
+    public void delete(Long id) throws FilmNotFoundException {
+        if (filmStorage.getById(id) != null) {
+            filmStorage.delete(id);
+        } else {
+            throw new FilmNotFoundException("Film with id = " + id + " not found");
         }
     }
 
@@ -70,6 +103,17 @@ public class FilmService {
         final Film film = filmStorage.getById(filmId);
         if (film == null) {
             throw new FilmNotFoundException("Film with id = " + filmId + " not found");
+        } else {
+            TreeSet<Integer> genresId = filmGenreStorage.getByFilmId(filmId);
+            LinkedHashSet<Genre> genres = new LinkedHashSet<>();
+            if (!genresId.isEmpty()) {
+                for (Integer genreId : genresId) {
+                    genres.add(genreStorage.getById(genreId));
+                }
+                film.setGenres(genres);
+            } else {
+                film.setGenres(null);
+            }
         }
         return film;
     }
@@ -78,8 +122,7 @@ public class FilmService {
      * Метод для получения списка первых count фильмов в порядке убывания количества лайков
      */
     public List<Film> getCountFilms(int count) {
-        List<Film> films = userFilmLikesStorage.getCount(count);
-        return films;
+        return userFilmLikesStorage.getCount(count);
     }
 
     /**

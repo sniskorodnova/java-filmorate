@@ -14,7 +14,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * Класс-сервис, отвечающий за логику работы с пользователями. Для реализации логики используются методы хранилища
+ * Класс-сервис, отвечающий за логику работы с пользователями
  */
 @Service
 @Slf4j
@@ -64,6 +64,17 @@ public class UserService {
             return userStorage.update(user);
         } else {
             throw new UserNotFoundException("User with id = " + user.getId() + " not found");
+        }
+    }
+
+    /**
+     * Метод удаления пользователя
+     */
+    public void delete(Long id) throws UserNotFoundException {
+        if (userStorage.getById(id) != null) {
+            userStorage.delete(id);
+        } else {
+            throw new UserNotFoundException("User with id = " + id + " not found");
         }
     }
 

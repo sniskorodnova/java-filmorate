@@ -32,11 +32,11 @@ public class FriendshipDbStorage implements FriendshipStorage {
         if (!checkIfFriendsAtAll(userId, friendId)) {
             if (checkIfFriendsAtAll(friendId, userId)) {
                 if (!checkIfConfirmedFriends(friendId, userId)) {
-                    String sqlQuery = "UPDATE \"friendship\" SET CONFIRMED = true WHERE USER_ID = ? AND FRIEND_ID = ?";
+                    String sqlQuery = "UPDATE friendship SET CONFIRMED = true WHERE USER_ID = ? AND FRIEND_ID = ?";
                     jdbcTemplate.update(sqlQuery, friendId, userId);
                 }
             } else {
-                String sqlQuery = "INSERT INTO \"friendship\" (USER_ID, FRIEND_ID, CONFIRMED)  VALUES (?, ?, false)";
+                String sqlQuery = "INSERT INTO friendship (USER_ID, FRIEND_ID, CONFIRMED)  VALUES (?, ?, false)";
                 jdbcTemplate.update(sqlQuery, userId, friendId);
             }
         }
@@ -46,7 +46,7 @@ public class FriendshipDbStorage implements FriendshipStorage {
      * Метод для проверки являются ли пользователи обоюдными друзьями
      */
     private boolean checkIfConfirmedFriends(Long userId, Long friendId) {
-        String sqlQuery = "SELECT * FROM \"friendship\" WHERE USER_ID = ? AND FRIEND_ID = ?";
+        String sqlQuery = "SELECT * FROM friendship WHERE USER_ID = ? AND FRIEND_ID = ?";
         SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, userId, friendId);
         row.next();
         return row.getBoolean("CONFIRMED");
@@ -56,7 +56,7 @@ public class FriendshipDbStorage implements FriendshipStorage {
      * Метод для проверки являются ли пользователи неподтвержденными друзьями
      */
     private boolean checkIfFriendsAtAll(Long userId, Long friendId) {
-        String sqlQuery = "SELECT * FROM \"friendship\" WHERE USER_ID = ? AND FRIEND_ID = ?";
+        String sqlQuery = "SELECT * FROM friendship WHERE USER_ID = ? AND FRIEND_ID = ?";
         SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, userId, friendId);
         int rowCount = 0;
         while (row.next()) {
@@ -70,12 +70,12 @@ public class FriendshipDbStorage implements FriendshipStorage {
      */
     @Override
     public List<User> getFriendsForUser(Long userId) {
-        String sqlQuery = "SELECT * FROM (SELECT USER_ID AS user_id FROM \"friendship\" "
+        String sqlQuery = "SELECT * FROM (SELECT USER_ID AS user_id FROM friendship "
                 + "WHERE FRIEND_ID = ? AND CONFIRMED = true "
                 + "UNION ALL "
-                + "SELECT FRIEND_ID AS user_id FROM \"friendship\" "
-                + "WHERE USER_ID = ?) AS users_id INNER JOIN \"user\" u "
-                + "ON u.USER_ID = users_id.user_id";
+                + "SELECT FRIEND_ID AS user_id FROM friendship "
+                + "WHERE USER_ID = ?) AS users_id INNER JOIN users u "
+                + "ON u.USER_ID = users_id.user_id AND (NOT u.is_delete)";
         return jdbcTemplate.query(sqlQuery, this::mapRowToUser, userId, userId);
     }
 
@@ -97,15 +97,17 @@ public class FriendshipDbStorage implements FriendshipStorage {
      */
     @Override
     public List<User> getCommonFriends(Long userId, Long otherUserId) {
-        String sqlQuery = "SELECT * FROM ((SELECT USER_ID AS user_id FROM \"friendship\" "
-                + "WHERE FRIEND_ID = ? "
+
+        String sqlQuery = "SELECT * FROM ((SELECT USER_ID AS user_id FROM friendship "
+                + "WHERE (FRIEND_ID = ?) "
                 + "UNION ALL "
-                + "SELECT FRIEND_ID AS user_id FROM \"friendship\" "
+                + "SELECT FRIEND_ID AS user_id FROM friendship "
                 + "WHERE USER_ID = ?) INTERSECT (SELECT USER_ID AS user_id "
-                + "FROM \"friendship\" WHERE FRIEND_ID = ? UNION ALL "
-                + "SELECT FRIEND_ID AS user_id FROM \"friendship\" "
+                + "FROM friendship WHERE FRIEND_ID = ? UNION ALL "
+                + "SELECT FRIEND_ID AS user_id FROM friendship "
                 + "WHERE USER_ID = ?)) AS common_friends "
-                + "INNER JOIN \"user\" u ON u.user_id = common_friends.user_id";
+                + "INNER JOIN users u ON u.user_id = common_friends.user_id AND (NOT u.is_delete)";
+
         return jdbcTemplate.query(sqlQuery, this::mapRowToUser, userId, userId, otherUserId, otherUserId);
     }
 
@@ -116,19 +118,19 @@ public class FriendshipDbStorage implements FriendshipStorage {
     public void deleteFromFriends(Long userId, Long friendId) {
         if (checkIfFriendsAtAll(friendId, userId)) {
             if (checkIfConfirmedFriends(friendId, userId)) {
-                String sqlQuery = "UPDATE \"friendship\" SET CONFIRMED = false WHERE USER_ID = ? AND FRIEND_ID = ?";
+                String sqlQuery = "UPDATE friendship SET CONFIRMED = false WHERE USER_ID = ? AND FRIEND_ID = ?";
                 jdbcTemplate.update(sqlQuery, friendId, userId);
             }
         } else {
             if (checkIfFriendsAtAll(userId, friendId)) {
                 if (checkIfConfirmedFriends(userId, friendId)) {
-                    String sqlQueryDelete = "DELETE FROM \"friendship\" WHERE USER_ID = ? AND FRIEND_ID = ?";
+                    String sqlQueryDelete = "DELETE FROM friendship WHERE USER_ID = ? AND FRIEND_ID = ?";
                     jdbcTemplate.update(sqlQueryDelete, userId, friendId);
-                    String sqlQueryInsert = "INSERT INTO \"friendship\" (USER_ID, FRIEND_ID, CONFIRMED)  "
+                    String sqlQueryInsert = "INSERT INTO friendship (USER_ID, FRIEND_ID, CONFIRMED)  "
                             + "VALUES (?, ?, false)";
                     jdbcTemplate.update(sqlQueryInsert, friendId, userId);
                 } else {
-                    String sqlQuery = "DELETE FROM \"friendship\" WHERE USER_ID = ? AND FRIEND_ID = ?";
+                    String sqlQuery = "DELETE FROM friendship WHERE USER_ID = ? AND FRIEND_ID = ?";
                     jdbcTemplate.update(sqlQuery, userId, friendId);
                 }
             }
