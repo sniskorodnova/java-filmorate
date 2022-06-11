@@ -21,7 +21,7 @@ public class ReviewLikesDbStorage implements ReviewLikesStorage {
 
     @Override
     public void removeLikeFromReview (Long reviewId, Long userId) {
-        String sqlQuery = "DELETE FROM review_likes WHERE REVIEW_ID = ? AND USER_ID = ?";
+        String sqlQuery = "UPDATE review_likes SET IS_DELETE = true WHERE REVIEW_ID = ? AND USER_ID = ?";
         jdbcTemplate.update(sqlQuery, reviewId, userId);
     }
 
@@ -33,13 +33,13 @@ public class ReviewLikesDbStorage implements ReviewLikesStorage {
 
     @Override
     public void removeDislikeFromReview (Long reviewId, Long userId) {
-        String sqlQuery = "DELETE FROM review_likes WHERE REVIEW_ID = ? AND USER_ID = ? ";
+        String sqlQuery = "UPDATE review_likes SET IS_DELETE = true WHERE REVIEW_ID = ? AND USER_ID = ? ";
         jdbcTemplate.update(sqlQuery, reviewId, userId);
     }
 
     @Override
     public boolean checkIfRecordExists(Long reviewId, Long userId) {
-        String sqlQuery = "SELECT * FROM review_likes WHERE REVIEW_ID = ? AND USER_ID = ?";
+        String sqlQuery = "SELECT * FROM review_likes WHERE REVIEW_ID = ? AND USER_ID = ? AND IS_DELETE = false";
         SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, reviewId, userId);
         int rowCount = 0;
         while (row.next()) {

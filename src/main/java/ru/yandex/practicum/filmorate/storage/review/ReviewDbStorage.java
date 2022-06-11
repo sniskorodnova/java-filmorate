@@ -44,7 +44,8 @@ public class ReviewDbStorage implements ReviewStorage {
     public Review getById(Long id) {
         String sqlQuery = "SELECT REVIEW_ID, CONTENT, IS_POSITIVE, USER_ID, FILM_ID, "
                 + "(SELECT SUM(DECODE(IS_LIKE, true, 1, -1)) FROM review_likes rl "
-                + "WHERE rl.REVIEW_ID = r.REVIEW_ID) USEFUL FROM review r WHERE r.REVIEW_ID = ?";
+                + "WHERE rl.REVIEW_ID = r.REVIEW_ID AND rl.IS_DELETE = false) USEFUL FROM review r "
+                + "WHERE r.REVIEW_ID = ? AND (NOT r.IS_DELETE)";
         SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
         if (row.next()) {
             return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToReview, id);
@@ -55,9 +56,7 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public Review update(Review review) {
-        String sqlQuery = "UPDATE review SET "
-                + "CONTENT = ?, IS_POSITIVE = ? "
-                + "WHERE REVIEW_ID = ?";
+        String sqlQuery = "UPDATE review SET CONTENT = ?, IS_POSITIVE = ? WHERE REVIEW_ID = ?";
 
         jdbcTemplate.update(sqlQuery,
                 review.getContent(),
@@ -70,14 +69,15 @@ public class ReviewDbStorage implements ReviewStorage {
     public List<Review> getReviewsForFilm(Long id, int count) {
         String sqlQuery = "SELECT REVIEW_ID, CONTENT, IS_POSITIVE, USER_ID, FILM_ID, "
                 + "(SELECT SUM(DECODE(IS_LIKE, true, 1, -1)) FROM review_likes rl "
-                + "WHERE rl.REVIEW_ID = r.REVIEW_ID) useful FROM review r WHERE r.FILM_ID = ? LIMIT ?";
+                + "WHERE rl.REVIEW_ID = r.REVIEW_ID) useful FROM review r WHERE r.FILM_ID = ? "
+                + "AND (NOT IS_DELETE) LIMIT ?";
 
         return jdbcTemplate.query(sqlQuery, this::mapRowToReview, id, count);
     }
 
     @Override
     public void deleteById(Long reviewId) {
-        String sqlQuery = "DELETE FROM review WHERE REVIEW_ID = ?";
+        String sqlQuery = "UPDATE review SET IS_DELETE = true WHERE REVIEW_ID = ?";
         jdbcTemplate.update(sqlQuery, reviewId);
     }
 
