@@ -140,10 +140,7 @@ public class UserController {
      */
     @GetMapping("/{id}/recommendations")
     public List<Film> getRecomendation(@PathVariable Long id) {
-        return userService.getRecommendation(id)
-                .stream()
-                .sorted((o1, o2) -> o2.getLikesFromUsers().size() - o1.getLikesFromUsers().size())
-                .limit(10L)
-                .collect(Collectors.toList());
+        log.debug("Входящий запрос на получение рекомендаций");
+        return userService.getRecommendation(id);
     }
 }

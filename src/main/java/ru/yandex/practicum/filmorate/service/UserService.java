@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -14,7 +15,10 @@ import ru.yandex.practicum.filmorate.storage.recommendations.UserRecommendationS
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -183,6 +187,33 @@ public class UserService {
     }
 
     public List<Film> getRecommendation(Long id) {
-        return userRecommendationStorage.getRecommendation(id).stream().map(filmStorage::getById).collect(Collectors.toList());
+        List<Long> userFilm = userRecommendationStorage.getUserFilms(id); // список фильмов, которые лайкнул пользователь
+        List<Long> listOfUsers = userRecommendationStorage.getListOfOtherUser(id); // список других пользователей
+        Set<Long> recommendedFilms = new HashSet<>(); // список фильмов для рекомендации
+
+
+        for (int i = 0; i < listOfUsers.size(); i++) {
+            List<Long> userList = new ArrayList<>(List.copyOf(userFilm)); // копия листа с фильмами юзера
+
+            List<Long> otherUserFilms = userRecommendationStorage.getFilmsOfOtherUser(listOfUsers, i);
+
+            userList.retainAll(otherUserFilms); // проверяю пересечение по лайкам с другим юзером
+
+            /**
+             * Здесь я реализовал проверку на то, что количество совпадений по лайкам
+             * с другим пользователем больше 50%, тогда рекомендация проходит
+             */
+            if (userList.size() > userFilm.size() / 2) {
+                otherUserFilms.removeAll(userFilm);
+
+                recommendedFilms.addAll(otherUserFilms);
+            }
+
+        }
+        return List.copyOf(recommendedFilms).stream()
+                .map(filmStorage::getById)
+                .sorted((o1, o2) -> o2.getLikesFromUsers().size() - o1.getLikesFromUsers().size())
+                .limit(10L)
+                .collect(Collectors.toList());
     }
 }

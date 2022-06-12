@@ -13,6 +13,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.friendship.FriendshipDbStorage;
 import ru.yandex.practicum.filmorate.storage.recommendations.UserRecommendationStorage;
@@ -40,7 +41,7 @@ class FilmorateApplicationTests {
 	private final FilmDbStorage filmDbStorage;
 	private final FriendshipDbStorage friendshipDbStorage;
 	private final UserFilmLikesDbStorage userFilmLikesDbStorage;
-	private final UserRecommendationStorage userRecommendationStorage;
+	private final UserService userService;
 
 	@Test
 	public void checkCreatedUserFindUserById() {
@@ -320,7 +321,7 @@ class FilmorateApplicationTests {
 		userFilmLikesDbStorage.saveLike(4L, 2L);
 		userFilmLikesDbStorage.saveLike(6L, 2L);
 
-		Long filmId = userRecommendationStorage.getRecommendation(user1.getId()).get(0);
+		Long filmId = userService.getRecommendation(user1.getId()).get(0).getId();
 
 		Film film = filmDbStorage.getById(filmId);
 
