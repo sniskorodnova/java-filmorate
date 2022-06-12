@@ -34,7 +34,8 @@ public class ReviewController {
      * Метод для редактирования отзыва. Новый объект отзыва передается в теле запроса
      */
     @PutMapping
-    public Review update(@RequestBody Review review) throws ValidationException, FilmNotFoundException {
+    public Review update(@RequestBody Review review) throws ValidationException, FilmNotFoundException,
+            ReviewNotFoundException {
         log.debug("Входящий запрос на редактирование отзыва");
         log.debug(review.toString());
         return reviewService.update(review);
@@ -55,7 +56,7 @@ public class ReviewController {
     @DeleteMapping("/{reviewId}")
     public void deleteById(@PathVariable Long reviewId) throws ReviewNotFoundException {
         log.debug("Входящий запрос на удаление отзыва с id = {}", reviewId);
-        reviewService.deleteDyId(reviewId);
+        reviewService.deleteById(reviewId);
     }
 
     /**

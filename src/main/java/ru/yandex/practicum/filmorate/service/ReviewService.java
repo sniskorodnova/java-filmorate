@@ -53,8 +53,12 @@ public class ReviewService {
     /**
      * Метод для редактирования отзыва
      */
-    public Review update(Review review) {
-        return reviewStorage.update(review);
+    public Review update(Review review) throws ReviewNotFoundException {
+        if (reviewStorage.getById(review.getId()) == null) {
+            throw new ReviewNotFoundException("Review with id = " + review.getId() + " not found");
+        } else {
+            return reviewStorage.update(review);
+        }
     }
 
     /**
@@ -144,7 +148,7 @@ public class ReviewService {
     /**
      * Метод для удаления отзыва по его id
      */
-    public void deleteDyId(Long reviewId) throws ReviewNotFoundException {
+    public void deleteById(Long reviewId) throws ReviewNotFoundException {
         if (reviewStorage.getById(reviewId) == null) {
             throw new ReviewNotFoundException("Review with id = " + reviewId + " not found");
         } else {
