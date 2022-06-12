@@ -13,6 +13,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Класс, имплементирующий интерфейс для работы с таблицей review в БД
+ */
 @Component
 public class ReviewDbStorage implements ReviewStorage {
     private final JdbcTemplate jdbcTemplate;
@@ -22,6 +25,9 @@ public class ReviewDbStorage implements ReviewStorage {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    /**
+     * Метод для создания нового отзыва в таблице
+     */
     @Override
     public Review create(Review review) {
         String sqlQuery = "INSERT INTO review (CONTENT, IS_POSITIVE, USER_ID, FILM_ID) " +
@@ -40,6 +46,9 @@ public class ReviewDbStorage implements ReviewStorage {
         return getById(key);
     }
 
+    /**
+     * Метод для получения отзыва по его id из таблицы
+     */
     @Override
     public Review getById(Long id) {
         String sqlQuery = "SELECT REVIEW_ID, CONTENT, IS_POSITIVE, USER_ID, FILM_ID, "
@@ -54,6 +63,9 @@ public class ReviewDbStorage implements ReviewStorage {
         }
     }
 
+    /**
+     * Метод для редактирования отзыва в таблице
+     */
     @Override
     public Review update(Review review) {
         String sqlQuery = "UPDATE review SET CONTENT = ?, IS_POSITIVE = ? WHERE REVIEW_ID = ?";
@@ -65,6 +77,9 @@ public class ReviewDbStorage implements ReviewStorage {
         return getById(review.getId());
     }
 
+    /**
+     * Метод для получения списка всех отзывов для фильма по его id из таблицы
+     */
     @Override
     public List<Review> getReviewsForFilm(Long id, int count) {
         String sqlQuery = "SELECT REVIEW_ID, CONTENT, IS_POSITIVE, USER_ID, FILM_ID, "
@@ -75,12 +90,18 @@ public class ReviewDbStorage implements ReviewStorage {
         return jdbcTemplate.query(sqlQuery, this::mapRowToReview, id, count);
     }
 
+    /**
+     * Метод для удаления отзыва по его id из таблицы. Удаление реализовано через проставление флага is_delete
+     */
     @Override
     public void deleteById(Long reviewId) {
         String sqlQuery = "UPDATE review SET IS_DELETE = true WHERE REVIEW_ID = ?";
         jdbcTemplate.update(sqlQuery, reviewId);
     }
 
+    /**
+     * Метод для маппинга полей отзыва из таблицы в объект
+     */
     private Review mapRowToReview(ResultSet resultSet, int rowNum) throws SQLException {
         return Review.builder()
                 .id(resultSet.getLong("REVIEW_ID"))

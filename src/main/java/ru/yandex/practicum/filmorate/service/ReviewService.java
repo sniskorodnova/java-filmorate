@@ -14,6 +14,9 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
 
+/**
+ * Класс-сервис, отвечающий за логику работы с отзывами
+ */
 @Service
 @Slf4j
 public class ReviewService {
@@ -32,6 +35,9 @@ public class ReviewService {
         this.filmStorage = filmStorage;
     }
 
+    /**
+     * Метод для создания отзыва
+     */
     public Review create(Review review) throws UserNotFoundException, FilmNotFoundException {
         User user = userStorage.getById(review.getUserId());
         Film film = filmStorage.getById(review.getFilmId());
@@ -44,10 +50,16 @@ public class ReviewService {
         }
     }
 
+    /**
+     * Метод для редактирования отзыва
+     */
     public Review update(Review review) {
         return reviewStorage.update(review);
     }
 
+    /**
+     * Метод для получения отзыва по его id
+     */
     public Review getById(Long id) throws ReviewNotFoundException {
         if (reviewStorage.getById(id) == null) {
             throw new ReviewNotFoundException("Review with id = " + id + " not found");
@@ -56,6 +68,9 @@ public class ReviewService {
         }
     }
 
+    /**
+     * Метод для получения отзывов для фильма по его id
+     */
     public List<Review> getReviewsForFilm(Long id, int count) throws FilmNotFoundException {
         if (filmStorage.getById(id) == null) {
             throw new FilmNotFoundException("Film with id = " + id + " not found");
@@ -64,6 +79,9 @@ public class ReviewService {
         }
     }
 
+    /**
+     * Метод для добавления лайка отзыву
+     */
     public void addLikeToReview(Long reviewId, Long userId) throws ReviewNotFoundException, UserNotFoundException,
             LikeRecordAlreadyExistsException {
         if (userStorage.getById(userId) == null) {
@@ -78,6 +96,9 @@ public class ReviewService {
         }
     }
 
+    /**
+     * Метод для добавления дизлайка отзыву
+     */
     public void addDislikeToReview(Long reviewId, Long userId) throws UserNotFoundException, ReviewNotFoundException,
             LikeRecordAlreadyExistsException {
         if (userStorage.getById(userId) == null) {
@@ -92,6 +113,9 @@ public class ReviewService {
         }
     }
 
+    /**
+     * Метод для удаления лайка у отзыва
+     */
     public void removeLikeFromReview(Long reviewId, Long userId) throws UserNotFoundException,
             ReviewNotFoundException {
         if (userStorage.getById(userId) == null) {
@@ -103,6 +127,9 @@ public class ReviewService {
         }
     }
 
+    /**
+     * Метод для удаления дизлайка у отзыва
+     */
     public void removeDislikeFromReview(Long reviewId, Long userId) throws UserNotFoundException,
             ReviewNotFoundException {
         if (userStorage.getById(userId) == null) {
@@ -114,6 +141,9 @@ public class ReviewService {
         }
     }
 
+    /**
+     * Метод для удаления отзыва по его id
+     */
     public void deleteDyId(Long reviewId) throws ReviewNotFoundException {
         if (reviewStorage.getById(reviewId) == null) {
             throw new ReviewNotFoundException("Review with id = " + reviewId + " not found");
