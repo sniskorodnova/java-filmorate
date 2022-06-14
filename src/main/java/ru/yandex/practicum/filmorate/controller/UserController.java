@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -73,6 +74,16 @@ public class UserController {
     public List<User> getFriendsForUser(@PathVariable Long userId) throws UserNotFoundException {
         log.debug("Входящий запрос на получения списка друзей для пользователя с id = {}", userId);
         return userService.getFriendsForUser(userId);
+    }
+
+    /**
+     * Метод для получения списка событий у пользователя
+     */
+    @GetMapping("/{userId}/feed")
+    public List<Feed> getEventFeedById(@PathVariable Long userId)
+            throws UserNotFoundException {
+        log.debug("Входящий запрос на получения списка событий для пользователей с id = {}", userId);
+        return userService.getEventFeedById(userId);
     }
 
     /**
