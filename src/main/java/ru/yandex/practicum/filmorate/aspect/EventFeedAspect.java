@@ -1,8 +1,9 @@
 package ru.yandex.practicum.filmorate.aspect;
 
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.After;
+import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -38,11 +39,11 @@ public class EventFeedAspect {
     public void executeEventLikeDelete() {
     }
 
-    @Pointcut("execution(* ru.yandex.practicum.filmorate.service.ReviewService.create(Object))")
+    @Pointcut("execution(* ru.yandex.practicum.filmorate.service.ReviewService.create(ru.yandex.practicum.filmorate.model.Review))")
     public void executeEventReviewAdd() {
     }
 
-    @Pointcut("execution(* ru.yandex.practicum.filmorate.service.ReviewService.update(Object))")
+    @Pointcut("execution(* ru.yandex.practicum.filmorate.service.ReviewService.update(ru.yandex.practicum.filmorate.model.Review)))")
     public void executeEventReviewUpdate() {
     }
 
@@ -51,79 +52,130 @@ public class EventFeedAspect {
     }
 
     /**
-     * Метод для обработки события дружба
+     * Метод для обработки события добавления в друзья
      */
-    @After("executeEventFriendshipAdd() || executeEventFriendshipDelete()")
-    public void processingEventFriendship(JoinPoint joinPoint) {
+    @AfterReturning("executeEventFriendshipAdd()")
+    public void processingEventFriendshipAdd(JoinPoint joinPoint) {
         //инициализация полей для объекта класса Feed
-        long timestamp = getTimeNow();
         Long userId = (Long) joinPoint.getArgs()[0];
-        String eventType = "FRIEND";
-        String operation = (joinPoint.getSignature().getName().equals("addToFriends")) ? "ADD" : "DELETE";
         Long entityId = feedStorage.getFriendshipIdByUserId(userId, (Long) joinPoint.getArgs()[1]);
-        //запись в хранилище
-        feedStorage.createEvent(
-                Feed.builder()
-                        .timestamp(timestamp)
-                        .userId(userId)
-                        .eventType(eventType)
-                        .operation(operation)
-                        .entityId(entityId)
-                        .build()
-        );
+        if (entityId != null) {
+            //запись в хранилище
+            feedStorage.createEvent(
+                    Feed.builder()
+                            .timestamp(getTimeNow())
+                            .userId(userId)
+                            .eventType("FRIEND")
+                            .operation("ADD")
+                            .entityId(entityId)
+                            .build()
+            );
+        }
     }
 
     /**
-     * Метод для обработки события Лайка
+     * Метод для обработки события удаления из друзей
      */
-    @After("executeEventLikeAdd() || executeEventLikeDelete()")
-    public void processingEventLike(JoinPoint joinPoint) {
+    @Before("executeEventFriendshipDelete()")
+    public void processingEventFriendshipDelete(JoinPoint joinPoint) {
         //инициализация полей для объекта класса Feed
-        long timestamp = getTimeNow();
+        Long userId = (Long) joinPoint.getArgs()[0];
+        Long entityId = feedStorage.getFriendshipIdByUserId(userId, (Long) joinPoint.getArgs()[1]);
+        if (entityId != null) {
+            //запись в хранилище
+            feedStorage.createEvent(
+                    Feed.builder()
+                            .timestamp(getTimeNow())
+                            .userId(userId)
+                            .eventType("FRIEND")
+                            .operation("REMOVE")
+                            .entityId(entityId)
+                            .build()
+            );
+        }
+    }
+
+    /**
+     * Метод для обработки события добавление лайка
+     */
+    @AfterReturning("executeEventLikeAdd()")
+    public void processingEventLikeAdd(JoinPoint joinPoint) {
+        //инициализация полей для объекта класса Feed
         Long userId = (Long) joinPoint.getArgs()[1];
-        String eventType = "LIKE";
-        String operation = (joinPoint.getSignature().getName().equals("likeFilm")) ? "ADD" : "DELETE";
         //запись в хранилище
         feedStorage.createEvent(
                 Feed.builder()
-                        .timestamp(timestamp)
+                        .timestamp(getTimeNow())
                         .userId(userId)
-                        .eventType(eventType)
-                        .operation(operation)
+                        .eventType("LIKE")
+                        .operation("ADD")
                         .entityId(userId)
                         .build()
         );
     }
 
     /**
-     * Метод для обработки события Отзыва
+     * Метод для обработки события удаление лайка
      */
-    @After("executeEventReviewAdd() || executeEventReviewUpdate() || executeEventReviewDelete()")
-    public void processingEventReview(JoinPoint joinPoint) {
-        //инициализация полей для объекта класса Feed
-        long timestamp = getTimeNow();
-        String eventType = "REVIEW";
-        Long userId;
-        String operation;
-        //определения метода
-        if (joinPoint.getSignature().getName().equals("deleteById")) {
-            userId = (Long) joinPoint.getArgs()[0];
-            operation = "REMOVE";
-        } else {
-            userId = ((Review) joinPoint.getArgs()[0]).getUserId();
-            operation = (joinPoint.getSignature().getName().equals("addToFriends")) ? "ADD" : "UPDATE";
-        }
-        Long entityId = feedStorage.getReviewIdByUserId(userId, ((Review) joinPoint.getArgs()[0]).getFilmId());
+    @Before("executeEventLikeDelete()")
+    public void processingEventLikeDelete(JoinPoint joinPoint) {
+        Long userId = (Long) joinPoint.getArgs()[1];
         //запись в хранилище
         feedStorage.createEvent(
                 Feed.builder()
-                        .timestamp(timestamp)
+                        .timestamp(getTimeNow())
                         .userId(userId)
-                        .eventType(eventType)
-                        .operation(operation)
-                        .entityId(entityId)
+                        .eventType("LIKE")
+                        .operation("REMOVE")
+                        .entityId(userId)
                         .build()
         );
+    }
+
+    /**
+     * Метод для обработки события добавления отзыва или обновление отзыва
+     */
+    @AfterReturning("executeEventReviewAdd() || executeEventReviewUpdate()")
+    public void processingEventReviewAddOrUpdate(JoinPoint joinPoint) {
+        //инициализация полей для объекта класса Feed
+        Long userId = ((Review) joinPoint.getArgs()[0]).getUserId();
+        String operation = (joinPoint.getSignature().getName().equals("addToFriends")) ? "ADD" : "UPDATE";
+        Long entityId = feedStorage.getReviewIdByUserId(userId, ((Review) joinPoint.getArgs()[0]).getFilmId());
+        if (entityId != null) {
+            //запись в хранилище
+            feedStorage.createEvent(
+                    Feed.builder()
+                            .timestamp(getTimeNow())
+                            .userId(userId)
+                            .eventType("REVIEW")
+                            .operation(operation)
+                            .entityId(entityId)
+                            .build()
+            );
+        }
+    }
+
+    /**
+     * Метод для обработки события удаление отзыва
+     */
+    @Before("executeEventReviewDelete()")
+    public void processingEventReviewDelete(JoinPoint joinPoint) {
+        //инициализация полей для объекта класса Feed
+        long timestamp = getTimeNow();
+        Long userId = (Long) joinPoint.getArgs()[0];
+        Long entityId = feedStorage.getReviewIdByUserId(userId, ((Review) joinPoint.getArgs()[0]).getFilmId());
+        if (entityId != null) {
+            //запись в хранилище
+            feedStorage.createEvent(
+                    Feed.builder()
+                            .timestamp(timestamp)
+                            .userId(userId)
+                            .eventType("REVIEW")
+                            .operation("REMOVE")
+                            .entityId(entityId)
+                            .build()
+            );
+        }
     }
 
     private long getTimeNow() {
