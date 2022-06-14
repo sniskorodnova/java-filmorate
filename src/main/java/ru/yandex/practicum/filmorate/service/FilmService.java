@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.aspect.EventLike;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -16,7 +17,9 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.storage.userfilmlikes.UserFilmLikesStorage;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.TreeSet;
 
 /**
  * Класс-сервис, отвечающий за логику работы с фильмами
@@ -154,6 +157,7 @@ public class FilmService {
     /**
      * Метод добавления лайка фильму от пользователя
      */
+    @EventLike
     public Film likeFilm(Long filmId, Long userId) throws UserNotFoundException, FilmNotFoundException {
         Film film = filmStorage.getById(filmId);
 
@@ -170,6 +174,7 @@ public class FilmService {
     /**
      * Метод удаления лайка пользователя у фильма
      */
+    @EventLike
     public Film deleteLike(Long filmId, Long userId) throws UserNotFoundException, FilmNotFoundException {
         Film film = filmStorage.getById(filmId);
         if (film == null) {

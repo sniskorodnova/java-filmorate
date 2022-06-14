@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -22,9 +21,9 @@ import java.util.Set;
  * Класс, имплементирующий интерфейс для работы с таблицей films в БД
  */
 @Component
-@Slf4j
 public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
+
     @Autowired
     public FilmDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -85,7 +84,7 @@ public class FilmDbStorage implements FilmStorage {
      * Метод для получения фильма по его id из таблицы
      */
     @Override
-    public Film getById (Long id) {
+    public Film getById(Long id) {
         String sqlQuery = "SELECT FILM_ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION, RATING_MPAA_ID " +
                 "FROM film WHERE (NOT is_delete) AND (FILM_ID = ?)";
         SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
@@ -125,7 +124,7 @@ public class FilmDbStorage implements FilmStorage {
         Set<Long> idLikes = new HashSet<>();
         String sqlFindLikes = "SELECT USER_ID FROM user_film_likes WHERE FILM_ID = ?";
         SqlRowSet row = jdbcTemplate.queryForRowSet(sqlFindLikes, resultSet.getLong("FILM_ID"));
-        while(row.next()) {
+        while (row.next()) {
             idLikes.add(row.getLong("USER_ID"));
         }
 

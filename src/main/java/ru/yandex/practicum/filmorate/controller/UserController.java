@@ -6,12 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Класс-контроллер для работы с пользователями
@@ -47,6 +46,16 @@ public class UserController {
     }
 
     /**
+     * Метод для получения списка событий у пользователя
+     */
+    @GetMapping("/{userId}/feed")
+    public List<Feed> getEventFeedById(@PathVariable Long userId)
+            throws UserNotFoundException {
+        log.debug("Входящий запрос на получения списка событий для пользователей с id = {}", userId);
+        return userService.getEventFeedById(userId);
+    }
+
+    /**
      * Метод для удаления пользователя из друзей другого пользователя
      */
     @DeleteMapping("/{userId}/friends/{friendId}")
@@ -54,16 +63,6 @@ public class UserController {
         log.debug("Входящий запрос на удаление из друзей пользователя с id = {} у пользователя c id = {}",
                 friendId, userId);
         return userService.deleteFromFriends(userId, friendId);
-    }
-
-    /**
-     * Метод удаления пользователя
-     */
-    @DeleteMapping("/{userId}")
-    public void delete (@PathVariable Long userId)
-            throws UserNotFoundException {
-        log.debug("Входящий запрос на удаление пользователя с id = {}", userId);
-        userService.delete(userId);
     }
 
     /**
@@ -132,15 +131,5 @@ public class UserController {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleServerError(final RuntimeException e) {
         return new ErrorResponse(e.getMessage());
-    }
-
-    /**
-     * Метод для получения рекомендаций для пользователя
-     * Выводит топ 10 рекомендаций, отсортированные по убыванию количества лайков
-     */
-    @GetMapping("/{id}/recommendations")
-    public List<Film> getRecomendation(@PathVariable Long id) {
-        log.debug("Входящий запрос на получение рекомендаций");
-        return userService.getRecommendation(id);
     }
 }

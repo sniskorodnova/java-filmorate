@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.aspect.EventReview;
 import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Review;
@@ -38,6 +39,7 @@ public class ReviewService {
     /**
      * Метод для создания отзыва
      */
+    @EventReview
     public Review create(Review review) throws UserNotFoundException, FilmNotFoundException {
         User user = userStorage.getById(review.getUserId());
         Film film = filmStorage.getById(review.getFilmId());
@@ -53,6 +55,7 @@ public class ReviewService {
     /**
      * Метод для редактирования отзыва
      */
+    @EventReview
     public Review update(Review review) throws ReviewNotFoundException {
         if (reviewStorage.getById(review.getId()) == null) {
             throw new ReviewNotFoundException("Review with id = " + review.getId() + " not found");
@@ -148,6 +151,7 @@ public class ReviewService {
     /**
      * Метод для удаления отзыва по его id
      */
+    @EventReview
     public void deleteById(Long reviewId) throws ReviewNotFoundException {
         if (reviewStorage.getById(reviewId) == null) {
             throw new ReviewNotFoundException("Review with id = " + reviewId + " not found");
