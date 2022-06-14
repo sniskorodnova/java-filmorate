@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Класс, описывающий сущность фильм
+ * Класс, описывающий сущность  фильм
  */
 @Data
 @Builder
