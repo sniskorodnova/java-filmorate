@@ -3,12 +3,13 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.feed.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.friendship.FriendshipStorage;
 import ru.yandex.practicum.filmorate.storage.recommendations.UserRecommendationStorage;
@@ -31,16 +32,19 @@ public class UserService {
     private final FriendshipStorage friendshipStorage;
     private final UserRecommendationStorage userRecommendationStorage;
     private final FilmStorage filmStorage;
+    private final FeedStorage feedStorage;
 
     @Autowired
     public UserService(@Qualifier("userDbStorage") UserStorage userStorage,
                        @Qualifier("friendshipDbStorage") FriendshipStorage friendshipStorage,
                        UserRecommendationStorage userRecommendationStorage,
-                       @Qualifier("filmDbStorage") FilmStorage filmStorage) {
+                       @Qualifier("filmDbStorage") FilmStorage filmStorage,
+                       FeedStorage feedStorage) {
         this.userStorage = userStorage;
         this.friendshipStorage = friendshipStorage;
         this.userRecommendationStorage = userRecommendationStorage;
         this.filmStorage = filmStorage;
+        this.feedStorage = feedStorage;
     }
 
     public UserStorage getUserStorage() {
@@ -166,6 +170,19 @@ public class UserService {
             throw new UserNotFoundException("User with id = " + otherUserId + " not found");
         } else {
             return friendshipStorage.getCommonFriends(userId, otherUserId);
+        }
+    }
+
+    /**
+     * Метод для получения списка событий у пользователя
+     */
+    public List<Feed> getEventFeedById(Long userId) throws UserNotFoundException {
+        User user = userStorage.getById(userId);
+
+        if (user == null) {
+            throw new UserNotFoundException("User with id = " + userId + " not found");
+        } else {
+            return feedStorage.findEventByUserId(userId);
         }
     }
 
