@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Feed;
 
@@ -48,6 +49,28 @@ public class FeedDbStorage implements FeedStorage {
     public List<Feed> findEventByUserId(Long userId) {
         String sqlQuery = "SELECT * FROM FEED WHERE USER_ID= ?";
         return jdbcTemplate.query(sqlQuery, this::mapRowToFeed, userId);
+    }
+
+    @Override
+    public Long getFriendshipIdByUserId(Long userId, Long friendId) {
+        String sqlQuery = "SELECT FRIENDSHIP_ID FROM FRIENDSHIP WHERE USER_ID = ? and FRIEND_ID = ?";
+        SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, userId, friendId);
+        if (row.next()) {
+            return row.getLong("FRIENDSHIP_ID");
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public Long getReviewIdByUserId(Long userId, Long filmId) {
+        String sqlQuery = "SELECT REVIEW_ID FROM REVIEW WHERE USER_ID = ? and FILM_ID = ?";
+        SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, userId, filmId);
+        if (row.next()) {
+            return row.getLong("REVIEW_ID");
+        } else {
+            return null;
+        }
     }
 
     /**

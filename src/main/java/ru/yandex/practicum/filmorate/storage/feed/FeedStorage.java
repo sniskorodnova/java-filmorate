@@ -11,4 +11,8 @@ public interface FeedStorage {
     void createEvent(Feed feed);
 
     List<Feed> findEventByUserId(Long userId);
+
+    Long getFriendshipIdByUserId(Long userId, Long friendId);
+
+    Long getReviewIdByUserId(Long userId, Long filmId);
 }

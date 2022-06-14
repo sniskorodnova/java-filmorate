@@ -5,14 +5,10 @@ import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.Review;
-import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.feed.FeedStorage;
-
 
 import java.time.Instant;
 
@@ -20,12 +16,10 @@ import java.time.Instant;
 @Aspect
 public class EventFeedAspect {
     private final FeedStorage feedStorage;
-    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public EventFeedAspect(FeedStorage feedStorage, JdbcTemplate jdbcTemplate) {
+    public EventFeedAspect(FeedStorage feedStorage) {
         this.feedStorage = feedStorage;
-        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Pointcut("execution(* ru.yandex.practicum.filmorate.service.UserService.addToFriends(Long, Long))")
@@ -66,7 +60,7 @@ public class EventFeedAspect {
         Long userId = (Long) joinPoint.getArgs()[0];
         String eventType = "FRIEND";
         String operation = (joinPoint.getSignature().getName().equals("addToFriends")) ? "ADD" : "DELETE";
-        Long entityId = getFriendshipIdByUserId(userId);
+        Long entityId = feedStorage.getFriendshipIdByUserId(userId, (Long) joinPoint.getArgs()[1]);
         //запись в хранилище
         feedStorage.createEvent(
                 Feed.builder()
@@ -119,7 +113,7 @@ public class EventFeedAspect {
             userId = ((Review) joinPoint.getArgs()[0]).getUserId();
             operation = (joinPoint.getSignature().getName().equals("addToFriends")) ? "ADD" : "UPDATE";
         }
-        Long entityId = getReviewIdByUserId(userId);
+        Long entityId = feedStorage.getReviewIdByUserId(userId, ((Review) joinPoint.getArgs()[0]).getFilmId());
         //запись в хранилище
         feedStorage.createEvent(
                 Feed.builder()
@@ -134,25 +128,5 @@ public class EventFeedAspect {
 
     private long getTimeNow() {
         return Instant.now().getEpochSecond();
-    }
-
-    private Long getFriendshipIdByUserId(Long userId) {
-        String sqlQuery = "SELECT FRIENDSHIP_ID FROM FRIENDSHIP WHERE USER_ID = ?";
-        SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, userId);
-        if (row.next()) {
-            return row.getLong("FRIENDSHIP_ID");
-        } else {
-            return null;
-        }
-    }
-
-    private Long getReviewIdByUserId(Long userId) {
-        String sqlQuery = "SELECT REVIEW_ID FROM REVIEW WHERE USER_ID = ?";
-        SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, userId);
-        if (row.next()) {
-            return row.getLong("REVIEW_ID");
-        } else {
-            return null;
-        }
     }
 }
