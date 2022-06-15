@@ -2,10 +2,16 @@ package ru.yandex.practicum.filmorate.storage.genrefilm;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.model.Genre;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  * Класс, имплементирующий интерфейс для работы с таблицей film_genre в БД
@@ -46,4 +52,25 @@ public class FilmGenreDbStorage implements FilmGenreStorage {
         String sqlQuery = "DELETE FROM film_genre WHERE FILM_ID = ?";
         jdbcTemplate.update(sqlQuery, filmId);
     }
+
+    @Override
+    public Set<Genre> getGenreList(Long filmId) {
+
+        String sqlQuery = "SELECT g.genre_id, g.name FROM film_genre fg "
+                + "INNER JOIN genre g ON g.genre_id = fg.genre_id WHERE fg.film_id = ?";
+
+        List<Genre> genreList = jdbcTemplate.query(sqlQuery, this::mapRowToGenre, filmId);
+        return genreList.stream().collect(Collectors.toSet());
+
+    }
+
+    private Genre mapRowToGenre(ResultSet resultSet, int rowNum) throws SQLException {
+        return Genre.builder()
+                .id(resultSet.getInt("genre_id"))
+                .name(resultSet.getString("name"))
+                .build();
+    }
+
+
+
 }
