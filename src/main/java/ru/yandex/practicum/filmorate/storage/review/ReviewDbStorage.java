@@ -37,7 +37,7 @@ public class ReviewDbStorage implements ReviewStorage {
         jdbcTemplate.update(connection -> {
             PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"REVIEW_ID"});
             stmt.setString(1, review.getContent());
-            stmt.setBoolean(2, review.isPositive());
+            stmt.setBoolean(2, review.getIsPositive());
             stmt.setLong(3, review.getUserId());
             stmt.setLong(4, review.getFilmId());
             return stmt;
@@ -72,7 +72,7 @@ public class ReviewDbStorage implements ReviewStorage {
 
         jdbcTemplate.update(sqlQuery,
                 review.getContent(),
-                review.isPositive(),
+                review.getIsPositive(),
                 review.getId());
         return getById(review.getId());
     }
@@ -88,6 +88,16 @@ public class ReviewDbStorage implements ReviewStorage {
                 + "AND (NOT IS_DELETE) LIMIT ?";
 
         return jdbcTemplate.query(sqlQuery, this::mapRowToReview, id, count);
+    }
+
+    @Override
+    public List<Review> getAllReviews(int count) {
+        String sqlQuery = "SELECT REVIEW_ID, CONTENT, IS_POSITIVE, USER_ID, FILM_ID, "
+                + "(SELECT SUM(DECODE(IS_LIKE, true, 1, -1)) FROM review_likes rl "
+                + "WHERE rl.REVIEW_ID = r.REVIEW_ID) useful FROM review r WHERE "
+                + "(NOT IS_DELETE) LIMIT ?";
+
+        return jdbcTemplate.query(sqlQuery, this::mapRowToReview, count);
     }
 
     /**

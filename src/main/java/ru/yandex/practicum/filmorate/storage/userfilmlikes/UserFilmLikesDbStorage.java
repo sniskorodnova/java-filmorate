@@ -4,10 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.storage.genrefilm.FilmGenreStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
@@ -15,11 +18,14 @@ import java.util.List;
  */
 @Component
 public class UserFilmLikesDbStorage implements UserFilmLikesStorage {
+
     private final JdbcTemplate jdbcTemplate;
+    private final FilmGenreStorage filmGenreStorage;
 
     @Autowired
-    public UserFilmLikesDbStorage(JdbcTemplate jdbcTemplate) {
+    public UserFilmLikesDbStorage(JdbcTemplate jdbcTemplate, FilmGenreStorage filmGenreStorage) {
         this.jdbcTemplate = jdbcTemplate;
+        this.filmGenreStorage = filmGenreStorage;
     }
 
     /**
@@ -82,12 +88,17 @@ public class UserFilmLikesDbStorage implements UserFilmLikesStorage {
         String sqlFindName = "SELECT RATING_MPAA_ID, NAME FROM rating_mpaa WHERE RATING_MPAA_ID = ?";
         Mpa mpa = jdbcTemplate.queryForObject(sqlFindName, this::mapRowToMpa, mpaId);
 
+        LinkedHashSet<Genre> setGenre = new LinkedHashSet<>();
+        filmGenreStorage.getGenreList(resultSet.getLong("FILM_ID")).stream()
+                .forEach(g -> setGenre.add(g));
+
         return Film.builder()
                 .id(resultSet.getLong("FILM_ID"))
                 .name(resultSet.getString("NAME"))
                 .description(resultSet.getString("DESCRIPTION"))
                 .releaseDate(resultSet.getDate("RELEASE_DATE").toLocalDate())
                 .duration(resultSet.getLong("DURATION"))
+                .genres(setGenre)
                 .mpa(mpa)
                 .build();
     }

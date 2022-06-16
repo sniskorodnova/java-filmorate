@@ -117,7 +117,7 @@ public class EventFeedAspect {
     /**
      * Метод для обработки события удаление лайка
      */
-    @Before("executeEventLikeDelete()")
+    @AfterReturning("executeEventLikeDelete()")
     public void processingEventLikeDelete(JoinPoint joinPoint) {
         Long userId = (Long) joinPoint.getArgs()[1];
         //запись в хранилище
@@ -163,7 +163,7 @@ public class EventFeedAspect {
         //инициализация полей для объекта класса Feed
         long timestamp = getTimeNow();
         Long userId = (Long) joinPoint.getArgs()[0];
-        Long entityId = feedStorage.getReviewIdByUserId(userId, ((Review) joinPoint.getArgs()[0]).getFilmId());
+        Long entityId = feedStorage.getReviewIdByUserId(userId, (Long) joinPoint.getArgs()[0]);
         if (entityId != null) {
             //запись в хранилище
             feedStorage.createEvent(

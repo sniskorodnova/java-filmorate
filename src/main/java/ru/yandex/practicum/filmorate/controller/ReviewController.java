@@ -24,7 +24,8 @@ public class ReviewController {
      * Метод для создания отзыва
      */
     @PostMapping
-    public Review create(@RequestBody Review review) throws UserNotFoundException, FilmNotFoundException {
+    public Review create(@RequestBody(required = true) Review review) throws UserNotFoundException, FilmNotFoundException,
+            ValidationException {
         log.debug("Входящий запрос на создание отзыва");
         log.debug(review.toString());
         return reviewService.create(review);
@@ -63,10 +64,11 @@ public class ReviewController {
      * Метод для получения всех отзывов для фильма по его id. Если фильм не найден, то возвращается 400 ошибка
      */
     @GetMapping()
-    public List<Review> getReviewsForFilm(@RequestParam Long film, @RequestParam(defaultValue = "10") int count)
+    public List<Review> getReviewsForFilm(@RequestParam(required = false) Long filmId,
+                                          @RequestParam(defaultValue = "10") int count)
             throws FilmNotFoundException {
-        log.debug("Входящий запрос на получение первых {} отзывов на фильм с id = {}", count, film);
-        return reviewService.getReviewsForFilm(film, count);
+        log.debug("Входящий запрос на получение первых {} отзывов на фильм с id = {}", count, filmId);
+        return reviewService.getReviewsForFilm(filmId, count);
     }
 
     /**
@@ -146,6 +148,12 @@ public class ReviewController {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleUserNotFound(final UserNotFoundException e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleValidationException(final ValidationException e) {
         return new ErrorResponse(e.getMessage());
     }
 }
