@@ -16,7 +16,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.service.ReviewService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.time.LocalDate;
@@ -31,8 +30,6 @@ public class EventFeedTest {
     private final UserService userService;
     @Autowired
     private final FilmService filmService;
-    @Autowired
-    private final ReviewService reviewService;
 
     private User user;
     private User otherUser;
@@ -77,7 +74,8 @@ public class EventFeedTest {
     }
 
     @Test
-    void test2_shouldGetTrueWhenLikeEventByAdd() throws ValidationException, FilmNotFoundException, UserNotFoundException {
+    void test2_shouldGetTrueWhenLikeEventByAdd() throws ValidationException, FilmNotFoundException,
+            UserNotFoundException {
         userService.create(user);
         filmService.create(film);
         filmService.likeFilm(1L, 1L);
@@ -90,16 +88,16 @@ public class EventFeedTest {
     }
 
     @Test
-    void test3_shouldGetTrueWhenLikeEventByDelete() throws ValidationException, FilmNotFoundException, UserNotFoundException {
+    void test3_shouldGetTrueWhenLikeEventByDelete() throws ValidationException, FilmNotFoundException,
+            UserNotFoundException {
         userService.create(user);
         filmService.create(film);
         filmService.likeFilm(1L, 1L);
         filmService.deleteLike(1L, 1L);
 
         List<Feed> resultFeed = userService.getEventFeedById(1L);
-
         Assertions.assertTrue(resultFeed.size() == 2
-                && resultFeed.get(1).getEventType().equals("LIKE")
-                && resultFeed.get(1).getOperation().equals("DELETE"));
+                && resultFeed.get(0).getEventType().equals("LIKE")
+                && resultFeed.get(1).getOperation().equals("REMOVE"));
     }
 }

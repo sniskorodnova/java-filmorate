@@ -117,7 +117,7 @@ public class EventFeedAspect {
     /**
      * Метод для обработки события удаление лайка
      */
-    @Before("executeEventLikeDelete()")
+    @AfterReturning("executeEventLikeDelete()")
     public void processingEventLikeDelete(JoinPoint joinPoint) {
         Long userId = (Long) joinPoint.getArgs()[1];
         //запись в хранилище
