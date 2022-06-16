@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 /**
- * Класс, описывающий рейтинг фильмов MPAA
+ * Класс, описывающий рейтинг фильмов mpa
  */
 @Data
 @Builder

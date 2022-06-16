@@ -54,7 +54,7 @@ class FilmControllerTest {
     }
 
     @Test
-    public void createValidFilmNameSuccess() throws ValidationException {
+    public void createValidFilmNameSuccess() throws ValidationException, FilmNotFoundException {
         Film film = Film.builder().name("Name").description("Description")
                 .releaseDate(LocalDate.of(2000, 2, 26)).duration(125L)
                 .mpa(Mpa.builder().id(3).build()).build();
@@ -76,7 +76,7 @@ class FilmControllerTest {
     }
 
     @Test
-    public void createFilmDescriptionHas200SymbolsSuccess() throws ValidationException {
+    public void createFilmDescriptionHas200SymbolsSuccess() throws ValidationException, FilmNotFoundException {
         Film film = Film.builder().name("Name")
                 .description("VeeryLongDescriptionVeeryLongDescriptionVeeryLongDescriptionVeeryLongDescription"
                         + "VeeryLongDescriptionVeeryLongDescriptionVeeryLongDescriptionVeeryLongDescriptionVeery"
@@ -97,7 +97,7 @@ class FilmControllerTest {
     }
 
     @Test
-    public void createFilmReleaseDate29December1895Success() throws ValidationException {
+    public void createFilmReleaseDate29December1895Success() throws ValidationException, FilmNotFoundException {
         Film film = Film.builder().name("Name").description("Description")
                 .releaseDate(LocalDate.of(1895, 12, 29)).duration(125L)
                 .mpa(Mpa.builder().id(3).build()).build();
@@ -124,7 +124,7 @@ class FilmControllerTest {
     }
 
     @Test
-    public void updateFilmNewNameIsEmptyThrowsValidationException() throws ValidationException {
+    public void updateFilmNewNameIsEmptyThrowsValidationException() throws ValidationException, FilmNotFoundException {
         Film film1 = Film.builder().name("Name1").description("Description1")
                 .releaseDate(LocalDate.of(1995, 12, 27)).duration(150L)
                 .mpa(Mpa.builder().id(3).build()).build();
@@ -137,7 +137,8 @@ class FilmControllerTest {
     }
 
     @Test
-    public void updateFilmNewDescriptionHas201SymbolsThrowsValidationException() throws ValidationException {
+    public void updateFilmNewDescriptionHas201SymbolsThrowsValidationException() throws ValidationException,
+            FilmNotFoundException {
         Film film1 = Film.builder().name("Name1").description("Description1")
                 .releaseDate(LocalDate.of(1995, 12, 27)).duration(150L)
                 .mpa(Mpa.builder().id(3).build()).build();
@@ -154,7 +155,8 @@ class FilmControllerTest {
     }
 
     @Test
-    public void updateFilmNewReleaseDateIs27December1895ThrowsValidationException() throws ValidationException {
+    public void updateFilmNewReleaseDateIs27December1895ThrowsValidationException() throws ValidationException,
+            FilmNotFoundException {
         Film film1 = Film.builder().name("Name1").description("Description1")
                 .releaseDate(LocalDate.of(1995, 12, 27)).duration(150L)
                 .mpa(Mpa.builder().id(3).build()).build();
@@ -167,7 +169,8 @@ class FilmControllerTest {
     }
 
     @Test
-    public void updateFilmNewDurationIsZeroThrowsValidationException() throws ValidationException {
+    public void updateFilmNewDurationIsZeroThrowsValidationException() throws ValidationException,
+            FilmNotFoundException {
         Film film1 = Film.builder().name("Name1").description("Description1")
                 .releaseDate(LocalDate.of(1995, 12, 27)).duration(150L)
                 .mpa(Mpa.builder().id(3).build()).build();
@@ -194,7 +197,7 @@ class FilmControllerTest {
     }
 
     @Test
-    public void createAndGetTwoFilms() throws ValidationException {
+    public void createAndGetTwoFilms() throws ValidationException, FilmNotFoundException {
         Film film1 = Film.builder().name("Name1").description("Description1")
                 .releaseDate(LocalDate.of(1995, 12, 27)).duration(150L)
                 .mpa(Mpa.builder().id(3).build()).build();
@@ -218,7 +221,8 @@ class FilmControllerTest {
     }
 
     @Test
-    public void filmLikedByNonExistedUserThrowUserNotFoundException() throws ValidationException {
+    public void filmLikedByNonExistedUserThrowUserNotFoundException() throws ValidationException,
+            FilmNotFoundException {
         Film film1 = Film.builder().name("Name1").description("Description1")
                 .releaseDate(LocalDate.of(1995, 12, 27)).duration(150L)
                 .mpa(Mpa.builder().id(3).build()).build();
@@ -254,7 +258,8 @@ class FilmControllerTest {
     }
 
     @Test
-    public void deleteLikeForFilmByNonExistedUserThrowUserNotFoundException() throws ValidationException {
+    public void deleteLikeForFilmByNonExistedUserThrowUserNotFoundException() throws ValidationException,
+            FilmNotFoundException {
         Film film1 = Film.builder().name("Name1").description("Description1")
                 .releaseDate(LocalDate.of(1995, 12, 27)).duration(150L)
                 .mpa(Mpa.builder().id(3).build()).build();
@@ -289,7 +294,7 @@ class FilmControllerTest {
     }
 
     @Test
-    public void getCountAllFilmsWithoutRates() throws ValidationException {
+    public void getCountAllFilmsWithoutRates() throws ValidationException, FilmNotFoundException {
         Film film1 = Film.builder().name("Name2").description("Description1")
                 .releaseDate(LocalDate.of(1995, 12, 27)).duration(150L)
                 .mpa(Mpa.builder().id(3).build()).build();
@@ -305,7 +310,7 @@ class FilmControllerTest {
     }
 
     @Test
-    public void getCountOneFilmAllFilmsWithoutRates() throws ValidationException {
+    public void getCountOneFilmAllFilmsWithoutRates() throws ValidationException, FilmNotFoundException {
         Film film1 = Film.builder().name("Name2").description("Description1")
                 .releaseDate(LocalDate.of(1995, 12, 27)).duration(150L)
                 .mpa(Mpa.builder().id(3).build()).build();
